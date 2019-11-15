@@ -14,16 +14,14 @@ __all__ = [
     'Token',
 ]
 
-INTEGER, PLUS, MINUS, MUL, DIV, LPAREN, RPAREN, EOF = (
-    'INTEGER',
-    'PLUS',
-    'MINUS',
-    'MUL',
-    'DIV',
-    '(',
-    ')',
-    'EOF',
-)
+INTEGER = 'INTEGER'
+PLUS = 'PLUS'
+MINUS = 'MINUS'
+MUL = 'MUL'
+DIV = 'DIV'
+LPAREN = '('
+RPAREN = ')'
+EOF = 'EOF'
 
 
 class Token:
