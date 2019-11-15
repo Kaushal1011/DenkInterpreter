@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from token import Token
-from typing import Union
 
 __all__ = [
     'AST',
