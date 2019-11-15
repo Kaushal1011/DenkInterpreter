@@ -41,24 +41,3 @@ class Interpreter(NodeVisitor):
             return ''
 
         return str(self.visit(tree))
-
-
-def main() -> None:
-    while True:
-        try:
-            text = input('>>> ')
-        except EOFError:
-            print()
-            break
-
-        if not text:
-            continue
-
-        lexer = Lexer(text)
-        parser = Parser(lexer)
-        interpreter = Interpreter(parser)
-        print(interpreter.interpret())
-
-
-if __name__ == '__main__':
-    main()
