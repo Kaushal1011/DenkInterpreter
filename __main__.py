@@ -15,7 +15,9 @@ def main() -> None:
         parser = Parser(lexer)
         interpreter = Interpreter(parser)
         result = interpreter.interpret()
-        print(interpreter.GLOBAL_SCOPE)
+
+        for k, v in sorted(interpreter.GLOBAL_SCOPE.items()):
+            print('{} = {}'.format(k, v))
 
 
 if __name__ == '__main__':

@@ -1,19 +1,44 @@
 #!/usr/bin/env python3
 
 from ast import *
-from parser import NodeVisitor, Parser
+from parser import Parser
 from token import *
+from typing import Union
 
 from lexer import Lexer
 
 
-class Interpreter(NodeVisitor):
-    GLOBAL_SCOPE = {}
+class NodeVisitor:
+    def visit(self, node: Union[UnaryOp, BinOp, Compound, Assign, NoOp,
+                                Program, Block, VarDecl, Type, Var]):
+        method_name = 'visit_' + type(node).__name__
+        visitor = getattr(self, method_name, self.generic_visit)
+        return visitor(node)
 
+    def generic_visit(self, node):
+        raise Exception('No visit_{} method'.format(type(node).__name__))
+
+
+class Interpreter(NodeVisitor):
     def __init__(self, parser: Parser):
         self.parser = parser
+        self.GLOBAL_SCOPE = {}
 
-    def visit_BinOp(self, node: BinOp) -> int:
+    def visit_Program(self, node: Program):
+        self.visit(node.block)
+
+    def visit_Block(self, node: Block):
+        for decls in node.declarations:
+            self.visit(decls)
+        self.visit(node.compound_statement)
+
+    def visit_VarDecl(self, node: VarDecl):
+        pass
+
+    def visit_Type(self, node: Type):
+        pass
+
+    def visit_BinOp(self, node: BinOp):
         if node.op.type == PLUS:
             return self.visit(node.left) + self.visit(node.right)
 
@@ -23,13 +48,16 @@ class Interpreter(NodeVisitor):
         if node.op.type == MUL:
             return self.visit(node.left) * self.visit(node.right)
 
-        if node.op.type == DIV:
+        if node.op.type == INTEGER_DIV:
             return self.visit(node.left) // self.visit(node.right)
 
-    def visit_Num(self, node: Num) -> int:
+        if node.op.type == FLOAT_DIV:
+            return self.visit(node.left) / self.visit(node.right)
+
+    def visit_Num(self, node: Num):
         return node.value
 
-    def visit_UnaryOp(self, node: UnaryOp) -> int:
+    def visit_UnaryOp(self, node: UnaryOp):
         op = node.op.type
         if op == PLUS:
             return +self.visit(node.expr)
@@ -57,9 +85,9 @@ class Interpreter(NodeVisitor):
         # Do nothing on empty statements
         pass
 
-    def interpret(self) -> str:
+    def interpret(self):
         tree = self.parser.parse()
         if tree is None:
             return ''
 
-        return str(self.visit(tree))
+        return self.visit(tree)

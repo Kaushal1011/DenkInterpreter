@@ -1,13 +1,21 @@
 #!/usr/bin/env python3
 
-from typing import Union
+from typing import Dict, Union
 
 __all__ = [
     'INTEGER',
+    'REAL',
     'PLUS',
+    'COMMA',
+    'COLON',
     'MINUS',
+    'VAR',
+    'PROGRAM',
+    'INTEGER_CONST',
+    'REAL_CONST',
     'MUL',
-    'DIV',
+    'INTEGER_DIV',
+    'FLOAT_DIV',
     'LPAREN',
     'RPAREN',
     'ID',
@@ -22,10 +30,14 @@ __all__ = [
 ]
 
 INTEGER = 'INTEGER'
+REAL = 'REAL'
+INTEGER_CONST = 'INTEGER_CONST'
+REAL_CONST = 'REAL_CONST'
 PLUS = 'PLUS'
 MINUS = 'MINUS'
 MUL = 'MUL'
-DIV = 'DIV'
+INTEGER_DIV = 'INTEGER_DIV'
+FLOAT_DIV = 'FLOAT_DIV'
 LPAREN = '('
 RPAREN = ')'
 ID = 'ID'
@@ -34,6 +46,10 @@ BEGIN = 'BEGIN'
 END = 'END'
 SEMI = 'SEMI'
 DOT = 'DOT'
+PROGRAM = 'PROGRAM'
+VAR = 'VAR'
+COLON = 'COLON'
+COMMA = 'COMMA'
 EOF = 'EOF'
 
 
@@ -49,7 +65,12 @@ class Token:
         return self.__str__()
 
 
-RESERVED_KEYWORDS = {
+RESERVED_KEYWORDS: Dict[str, Token] = {
     'BEGIN': Token('BEGIN', 'BEGIN'),
-    'END': Token('END', 'END')
+    'END': Token('END', 'END'),
+    'DIV': Token('INTEGER_DIV', 'DIV'),
+    'INTEGER': Token('INTEGER', 'INTEGER'),
+    'REAL': Token('REAL', 'REAL'),
+    'PROGRAM': Token('PROGRAM', 'PROGRAM'),
+    'VAR': Token('VAR', 'VAR')
 }

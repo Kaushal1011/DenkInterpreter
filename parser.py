@@ -21,6 +21,55 @@ class Parser:
         else:
             self.error()
 
+    def type_spec(self) -> Type:
+        token = self.curr_token
+        if self.curr_token.type == INTEGER:
+            self.eat(INTEGER)
+        else:
+            self.eat(REAL)
+
+        return Type(token)
+
+    def variable_declaration(self) -> List[VarDecl]:
+        var_nodes = [Var(self.curr_token)]
+        self.eat(ID)
+
+        while self.curr_token.type == COMMA:
+            self.eat(COMMA)
+            var_nodes.append(Var(self.curr_token))
+            self.eat(ID)
+
+        self.eat(COLON)
+
+        type_node = self.type_spec()
+        return [VarDecl(var_node, type_node) for var_node in var_nodes]
+
+    def declarations(self) -> List[VarDecl]:
+        decs: List[VarDecl] = []
+        if self.curr_token.type == VAR:
+            self.eat(VAR)
+            while self.curr_token.type == ID:
+                var_decl = self.variable_declaration()
+                decs.extend(var_decl)
+                self.eat(SEMI)
+
+        return decs
+
+    def block(self) -> Block:
+        dec_nodes = self.declarations()
+        comp_stmt_node = self.compound_statement()
+        return Block(dec_nodes, comp_stmt_node)
+
+    def program(self) -> Program:
+        self.eat(PROGRAM)
+        var_node = self.variable()
+        prog_name = var_node.value
+        self.eat(SEMI)
+        block_node = self.block()
+        program_node = Program(prog_name, block_node)
+        self.eat(DOT)
+        return program_node
+
     def empty(self) -> NoOp:
         return NoOp()
 
@@ -55,9 +104,6 @@ class Parser:
             self.eat(SEMI)
             results.append(self.statement())
 
-        if self.curr_token.type == ID:
-            self.error()
-
         return results
 
     def compound_statement(self) -> Compound:
@@ -71,11 +117,6 @@ class Parser:
 
         return root
 
-    def program(self) -> Compound:
-        node = self.compound_statement()
-        self.eat(DOT)
-        return node
-
     def factor(self) -> Union[Num, UnaryOp]:
         token = self.curr_token
         if token.type == PLUS:
@@ -86,8 +127,12 @@ class Parser:
             self.eat(MINUS)
             return UnaryOp(token, self.factor())
 
-        if token.type == INTEGER:
-            self.eat(INTEGER)
+        if token.type == INTEGER_CONST:
+            self.eat(INTEGER_CONST)
+            return Num(token)
+
+        if token.type == REAL_CONST:
+            self.eat(REAL_CONST)
             return Num(token)
 
         if token.type == LPAREN:
@@ -101,12 +146,9 @@ class Parser:
     def term(self) -> BinOp:
         node = self.factor()
 
-        while self.curr_token.type in (MUL, DIV):
+        while self.curr_token.type in (MUL, INTEGER_DIV, FLOAT_DIV):
             token = self.curr_token
-            if token.type == MUL:
-                self.eat(MUL)
-            elif token.type == DIV:
-                self.eat(DIV)
+            self.eat(token.type)
 
             node = BinOp(left=node, op=token, right=self.factor())
 
@@ -117,10 +159,7 @@ class Parser:
 
         while self.curr_token.type in (PLUS, MINUS):
             token = self.curr_token
-            if token.type == PLUS:
-                self.eat(PLUS)
-            elif token.type == MINUS:
-                self.eat(MINUS)
+            self.eat(token.type)
 
             node = BinOp(left=node, op=token, right=self.term())
 
@@ -128,7 +167,12 @@ class Parser:
 
     def parse(self) -> Compound:
         '''
-        program : compound_statement DOT
+        program : PROGRAM variable SEMI block DOT
+        block : declarations compound_statement
+        declarations : VAR (variable_declaration SEMI)+
+                     | empty
+        variable_declaration : ID (COMMA ID)* COLON type_spec
+        type_spec : INTEGER | REAL
         compound_statement : BEGIN statement_list END
         statement_list : statement
                        | statement SEMI statement_list
@@ -137,11 +181,12 @@ class Parser:
                   | empty
         assignment_statement : variable ASSIGN expr
         empty :
-        expr: term ((PLUS | MINUS) term)*
-        term: factor ((MUL | DIV) factor)*
+        expr : term ((PLUS | MINUS) term)*
+        term : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*
         factor : PLUS factor
                | MINUS factor
-               | INTEGER
+               | INTEGER_CONST
+               | REAL_CONST
                | LPAREN expr RPAREN
                | variable
         variable: ID
@@ -152,14 +197,3 @@ class Parser:
             self.error()
 
         return node
-
-
-class NodeVisitor:
-    def visit(self,
-              node: Union[UnaryOp, BinOp, Compound, Assign, NoOp]) -> int:
-        method_name = 'visit_' + type(node).__name__
-        visitor = getattr(self, method_name, self.generic_visit)
-        return visitor(node)
-
-    def generic_visit(self, node):
-        raise Exception('No visit_{} method'.format(type(node).__name__))
