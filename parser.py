@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
+from ast import *
 from token import *
+from typing import Union
 
 from lexer import Lexer
-
-from ast import *
 
 
 class Parser:
@@ -21,8 +21,16 @@ class Parser:
         else:
             self.error()
 
-    def factor(self) -> Num:
+    def factor(self) -> Union[Num, UnaryOp]:
         token = self.curr_token
+        if token.type == PLUS:
+            self.eat(PLUS)
+            return UnaryOp(token, self.factor())
+
+        if token.type == MINUS:
+            self.eat(MINUS)
+            return UnaryOp(token, self.factor())
+
         if token.type == INTEGER:
             self.eat(INTEGER)
             return Num(token)
@@ -33,7 +41,7 @@ class Parser:
             self.eat(RPAREN)
             return node
 
-    def term(self) -> BinOp:
+    def term(self) -> Union[BinOp, UnaryOp]:
         node = self.factor()
 
         while self.curr_token.type in (MUL, DIV):
@@ -47,7 +55,7 @@ class Parser:
 
         return node
 
-    def expr(self) -> BinOp:
+    def expr(self) -> Union[BinOp, UnaryOp]:
         node = self.term()
 
         while self.curr_token.type in (PLUS, MINUS):
@@ -61,15 +69,15 @@ class Parser:
 
         return node
 
-    def parse(self) -> AST:
+    def parse(self) -> Union[BinOp]:
         return self.expr()
 
 
 class NodeVisitor:
-    def visit(self, node: BinOp):
+    def visit(self, node: Union[UnaryOp, BinOp]):
         method_name = 'visit_' + type(node).__name__
-        visitor = getattr(self, method_name, default=self.generic_visit)
+        visitor = getattr(self, method_name, self.generic_visit)
         return visitor(node)
 
-    def generic_visit(self, node: BinOp):
+    def generic_visit(self, node: Union[UnaryOp, BinOp]):
         raise Exception('No visit_{} method'.format(type(node).__name__))

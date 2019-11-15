@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 from token import Token
+from typing import Union
 
 __all__ = [
     'AST',
     'BinOp',
     'Num',
+    'UnaryOp',
 ]
 
 
@@ -24,3 +26,9 @@ class BinOp(AST):
         self.left = left
         self.token = self.op = op
         self.right = right
+
+
+class UnaryOp(AST):
+    def __init__(self, op: Token, expr: Num):
+        self.token = self.op = op
+        self.expr = expr

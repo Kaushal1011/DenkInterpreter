@@ -11,7 +11,7 @@ class Interpreter(NodeVisitor):
     def __init__(self, parser: Parser):
         self.parser = parser
 
-    def visit_BinOp(self, node: BinOp):
+    def visit_BinOp(self, node: BinOp) -> int:
         if node.op.type == PLUS:
             return self.visit(node.left) + self.visit(node.right)
 
@@ -22,14 +22,25 @@ class Interpreter(NodeVisitor):
             return self.visit(node.left) * self.visit(node.right)
 
         if node.op.type == DIV:
-            return self.visit(node.left) / self.visit(node.right)
+            return self.visit(node.left) // self.visit(node.right)
 
-    def visit_Num(self, node: Num):
+    def visit_Num(self, node: Num) -> int:
         return node.value
 
-    def interpret(self):
+    def visit_UnaryOp(self, node: UnaryOp) -> int:
+        op = node.op.type
+        if op == PLUS:
+            return +self.visit(node.expr)
+
+        if op == MINUS:
+            return -self.visit(node.expr)
+
+    def interpret(self) -> str:
         tree = self.parser.parse()
-        return self.visit(tree)
+        if tree is None:
+            return ''
+
+        return str(self.visit(tree))
 
 
 def main() -> None:
@@ -37,15 +48,16 @@ def main() -> None:
         try:
             text = input('>>> ')
         except EOFError:
+            print()
             break
 
         if not text:
             continue
 
         lexer = Lexer(text)
-        interpreter = Interpreter(lexer)
-        result = interpreter.expr()
-        print(result)
+        parser = Parser(lexer)
+        interpreter = Interpreter(parser)
+        print(interpreter.interpret())
 
 
 if __name__ == '__main__':
