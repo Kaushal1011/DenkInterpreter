@@ -74,7 +74,7 @@ class Parser:
 
 
 class NodeVisitor:
-    def visit(self, node: Union[UnaryOp, BinOp]):
+    def visit(self, node: Union[UnaryOp, BinOp]) -> int:
         method_name = 'visit_' + type(node).__name__
         visitor = getattr(self, method_name, self.generic_visit)
         return visitor(node)
