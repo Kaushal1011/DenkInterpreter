@@ -7,20 +7,15 @@ from lexer import Lexer
 
 
 def main() -> None:
-    while True:
-        try:
-            text = input('>>> ')
-        except EOFError:
-            print()
-            break
-
-        if not text:
-            continue
+    import sys
+    with open(sys.argv[1]) as f:
+        text = f.read()
 
         lexer = Lexer(text)
         parser = Parser(lexer)
         interpreter = Interpreter(parser)
-        print(interpreter.interpret())
+        result = interpreter.interpret()
+        print(interpreter.GLOBAL_SCOPE)
 
 
 if __name__ == '__main__':

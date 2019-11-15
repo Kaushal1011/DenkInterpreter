@@ -8,6 +8,8 @@ from lexer import Lexer
 
 
 class Interpreter(NodeVisitor):
+    GLOBAL_SCOPE = {}
+
     def __init__(self, parser: Parser):
         self.parser = parser
 
@@ -34,6 +36,26 @@ class Interpreter(NodeVisitor):
 
         if op == MINUS:
             return -self.visit(node.expr)
+
+    def visit_Compound(self, node: Compound):
+        for child in node.children:
+            self.visit(child)
+
+    def visit_Assign(self, node: Assign):
+        var = node.left.value
+        self.GLOBAL_SCOPE[var] = self.visit(node.right)
+
+    def visit_Var(self, node: Token):
+        var = node.value
+        val = self.GLOBAL_SCOPE.get(var)
+        if val is None:
+            raise NameError(repr(var))
+
+        return val
+
+    def visit_NoOp(self, node: Token):
+        # Do nothing on empty statements
+        pass
 
     def interpret(self) -> str:
         tree = self.parser.parse()

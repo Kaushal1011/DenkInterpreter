@@ -10,8 +10,15 @@ __all__ = [
     'DIV',
     'LPAREN',
     'RPAREN',
+    'ID',
+    'ASSIGN',
+    'BEGIN',
+    'END',
+    'SEMI',
+    'DOT',
     'EOF',
     'Token',
+    'RESERVED_KEYWORDS',
 ]
 
 INTEGER = 'INTEGER'
@@ -21,6 +28,12 @@ MUL = 'MUL'
 DIV = 'DIV'
 LPAREN = '('
 RPAREN = ')'
+ID = 'ID'
+ASSIGN = 'ASSIGN'
+BEGIN = 'BEGIN'
+END = 'END'
+SEMI = 'SEMI'
+DOT = 'DOT'
 EOF = 'EOF'
 
 
@@ -34,3 +47,9 @@ class Token:
 
     def __repr__(self):
         return self.__str__()
+
+
+RESERVED_KEYWORDS = {
+    'BEGIN': Token('BEGIN', 'BEGIN'),
+    'END': Token('END', 'END')
+}
