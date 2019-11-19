@@ -65,7 +65,7 @@ class ScopedSymbolTable:
     def __init__(self, scope_name,scopeType, scope_level, enclosing_scope=None):
         self._symbols = {}
         self.scope_name = scope_name
-        self.scopeType=TokenType
+        self.scopeType=scopeType
         self.scope_level = scope_level
         self.enclosing_scope = enclosing_scope
         self._init_builtins()
@@ -217,11 +217,12 @@ class SemanticAnalyzer(NodeVisitor):
             )
         self.current_scope=procedureScope
         for param in node.params:
-            paramType=self.current_scope.lookup(param.typeNode.value)
+            paramType=self.current_scope.lookup(param.type_node.value)
             paramName=param.var_node.value
             varSymbol=VarSymbol(paramName,paramType)
             self.current_scope.insert(varSymbol)
             funcSymbol.params.append(varSymbol)
+            # print(paramName)
 
         self.visit_Type(node.returnType)
         self.visit(node.blockNode)
@@ -231,7 +232,7 @@ class SemanticAnalyzer(NodeVisitor):
             ErrorCode.MISSING_RETURN,
             node.token
         )
-        self.current_scope=self.current_scope.enclosingScope
+        self.current_scope=self.current_scope.enclosing_scope
         self.log('Leave scope : {}'.format(funcName))
 
 
@@ -263,7 +264,8 @@ class SemanticAnalyzer(NodeVisitor):
         # self.visit(node.left)
         varName=node.left.value
         currentScope=self.current_scope
-        if currentScope.scopeType == TokenType.FUNCTION and varName== currentScope.ScopeName:
+        # priprint(varName,currentScope.scopeType,currentScope.scope_name)
+        if currentScope.scopeType == TokenType.FUNCTION and varName== currentScope.scope_name:
             currentScope.hasReturnStatement=True
         else:
             VarSymbol=self.current_scope.lookup(varName)
@@ -288,7 +290,7 @@ class SemanticAnalyzer(NodeVisitor):
             self.visit(param_node)
 
     def visit_Call(self,node):
-        for param_node in node.actual_params:
+        for param_node in node.actualParams:
             self.visit(param_node)
 
     def visit_Condition(self,node):
@@ -308,3 +310,6 @@ class SemanticAnalyzer(NodeVisitor):
 
     def visit_MyDo(self,node):
         self.visit(node.child)
+
+    def visit_MyBoolean(self,node):
+        return node.value

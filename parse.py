@@ -13,7 +13,7 @@ class AST:
 
 
 class BinOp(AST):
-    def __init__(self, left, op, right):
+    def __init__(self, left, op:TokenType, right):
         self.left = left
         self.token = self.op = op
         self.right = right
@@ -26,9 +26,9 @@ class Num(AST):
 
 
 class UnaryOp(AST):
-    def __init__(self, op, expr):
+    def __init__(self, op, right):
         self.token = self.op = op
-        self.expr = expr
+        self.right = right
 
 
 class Compound(AST):
@@ -200,6 +200,7 @@ class Parser():
         # otherwise raise an exception.
         if self.current_token.type == token_type and self.current_token is not None:
             self.current_token = self.get_next_token()
+            # print(self.current_token)
         else:
             self.error(
                 error_code=ErrorCode.UNEXPECTED_TOKEN,
@@ -245,7 +246,7 @@ class Parser():
             result = self.expr()
             self.eat(TokenType.RPAREN)
             return result
-        elif self.current_token.type == TokenType.ID and self.peek() == TokenType.LPAREN:
+        elif self.current_token.type == TokenType.ID and self.peek() == '(':
             return self.callStatement()
         else:
             return self.variable()
@@ -312,7 +313,7 @@ class Parser():
             elif self.current_token.type == TokenType.PROCEDURE:
                 proc_decl = self.procedure_declaration()
                 declarations.append(proc_decl)
-            elif self.current_token == TokenType.FUNCTION:
+            elif self.current_token.type == TokenType.FUNCTION:
                 func_decl = self.function_declaration()
                 declarations.append(func_decl)
             else:
@@ -323,42 +324,6 @@ class Parser():
         #     declarations.append(proc_decl)
 
         return declarations
-
-    def formal_parameters(self):
-        """ formal_parameters : ID (COMMA ID)* COLON type_spec """
-        param_nodes = []
-
-        param_tokens = [self.current_token]
-        self.eat(TokenType.ID)
-        while self.current_token.type == TokenType.COMMA:
-            self.eat(TokenType.COMMA)
-            param_tokens.append(self.current_token)
-            self.eat(TokenType.ID)
-
-        self.eat(TokenType.COLON)
-        type_node = self.type_spec()
-
-        for param_token in param_tokens:
-            param_node = Param(Var(param_token), type_node)
-            param_nodes.append(param_node)
-
-        return param_nodes
-
-    def formal_parameter_list(self):
-        """ formal_parameter_list : formal_parameters
-                                  | formal_parameters SEMI formal_parameter_list
-        """
-        # procedure Foo();
-        if not self.current_token.type == TokenType.ID:
-            return []
-
-        param_nodes = self.formal_parameters()
-
-        while self.current_token.type == TokenType.SEMI:
-            self.eat(TokenType.SEMI)
-            param_nodes.extend(self.formal_parameters())
-
-        return param_nodes
 
     def variable_declaration(self):
         """variable_declaration : ID (COMMA ID)* COLON type_spec"""
@@ -388,15 +353,13 @@ class Parser():
         self.eat(TokenType.ID)
         params = []
 
-        if self.current_token.type == TokenType.LPAREN:
-            self.eat(TokenType.LPAREN)
-            params = self.formal_parameter_list()
-            self.eat(TokenType.RPAREN)
+
+        params = self.formal_parameter_list()
+
 
         self.eat(TokenType.SEMI)
         block_node = self.block()
-        proc_decl = ProcedureDecl(
-            proc_name, params, block_node, self.current_token)
+        proc_decl = ProcedureDecl(proc_name, params, block_node, self.current_token)
         self.eat(TokenType.SEMI)
         return proc_decl
 
@@ -405,17 +368,56 @@ class Parser():
         funcName = self.current_token.value
         token = self.current_token
         self.eat(TokenType.ID)
-        params = []
-        if self.current_token.type == TokenType.LPAREN:
-            self.eat(TokenType.LPAREN)
-            params = self.formal_parameter_list()
-            self.eat(TokenType.RPAREN)
+        # params = []
+        params = self.formal_parameter_list()
         self.eat(TokenType.COLON)
         typ = self.type_spec()
         self.eat(TokenType.SEMI)
         block_node = self.block()
+        self.eat(TokenType.SEMI)
         funcDecl = FunctionDecl(funcName, params, typ, block_node, token)
         return funcDecl
+
+
+    def formal_parameters(self):
+        """ formal_parameters : ID (COMMA ID)* COLON type_spec """
+        param_nodes = []
+
+        param_tokens = [self.current_token]
+        self.eat(TokenType.ID)
+        while self.current_token.type == TokenType.COMMA:
+            self.eat(TokenType.COMMA)
+            param_tokens.append(self.current_token)
+            self.eat(TokenType.ID)
+
+        self.eat(TokenType.COLON)
+        type_node = self.type_spec()
+
+        for param_token in param_tokens:
+            param_node = Param(Var(param_token), type_node)
+            param_nodes.append(param_node)
+
+        return param_nodes
+
+    def formal_parameter_list(self):
+        """ formal_parameter_list : formal_parameters
+                                  | formal_parameters SEMI formal_parameter_list
+        """
+        # procedure Foo();
+        declarations=[]
+        if self.current_token.type==TokenType.LPAREN:
+            self.eat(TokenType.LPAREN)
+            while(self.current_token.type==TokenType.ID):
+                vardec=self.formal_parameters()
+                declarations.extend(vardec)
+                if self.current_token.type==TokenType.RPAREN:
+                    break
+                elif self.current_token.type==TokenType.SEMI:
+                    self.eat(TokenType.SEMI)
+            self.eat(TokenType.RPAREN)
+        return declarations
+
+
 
     def type_spec(self):
         """type_spec : INTEGER
@@ -424,8 +426,10 @@ class Parser():
         token = self.current_token
         if self.current_token.type == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
-        else:
+        elif self.current_token.type==TokenType.REAL:
             self.eat(TokenType.REAL)
+        else:
+            self.eat(TokenType.BOOLEAN)
         node = Type(token)
         return node
 
@@ -478,7 +482,7 @@ class Parser():
         elif (self.current_token.type == TokenType.ID and
               self.lexer.current_char == '('
               ):
-            node = self.proccall_statement()
+            node = self.callStatement()
         elif self.current_token.type == TokenType.ID:
             node = self.assignment_statement()
         else:
@@ -504,9 +508,9 @@ class Parser():
 
         self.eat(TokenType.RPAREN)
 
-        node = ProcedureCall(
-            proc_name=proc_name,
-            actual_params=actual_params,
+        node = Call(
+            name=proc_name,
+            actualParams=actual_params,
             token=token,
         )
         return node
@@ -569,8 +573,10 @@ class Parser():
         token = self.current_token
 
         proc_name = self.current_token.value
+        # print(f"call on {token} and {proc_name}")
         self.eat(TokenType.ID)
         self.eat(TokenType.LPAREN)
+
         actual_params = []
 
         while self.current_token.type != TokenType.RPAREN:
@@ -581,14 +587,13 @@ class Parser():
                 break
             elif self.current_token.type==TokenType.COMMA:
                 self.eat(TokenType.COMMA)
-            else:
-                _=None
+
 
         self.eat(TokenType.RPAREN)
 
-        node = ProcedureCall(
-            proc_name=proc_name,
-            actual_params=actual_params,
+        node = Call(
+            name=proc_name,
+            actualParams=actual_params,
             token=token,
         )
         return node

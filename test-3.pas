@@ -9,4 +9,7 @@ begin { Main }
     x := 1;
     y := 0;
     PlusXAndY();
+    x:=x+2;
+    y:=y+2;
+
 end.  { Main }

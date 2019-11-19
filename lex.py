@@ -39,6 +39,8 @@ class TokenType(Enum):
     INTEGER_DIV = 'DIV'
     VAR = 'VAR'
     PROCEDURE = 'PROCEDURE'
+    # PRINT         = 'PRINT'
+    # STRING = 'STRING'
     BEGIN = 'BEGIN'
     END = 'END'      # marks the end of the block
     # misc
@@ -50,7 +52,7 @@ class TokenType(Enum):
     NOT_EQUALS = '<>'
     GREATER_OR_EQUALS_THAN = ">="
     LESS_OR_EQUALS_THAN = "<="
-#   PRINT         = 'PRINT'
+
 #
 
 
@@ -187,6 +189,36 @@ class Lexer:
 
         return token
 
+    def integer(self):
+        """Return a (multidigit) integer or float consumed from the input."""
+
+        # Create a new token with current line and column number
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
+
+        result = ''
+        while self.current_char is not None and self.current_char.isdigit():
+            result += self.current_char
+            self.advance()
+
+        if self.current_char == '.':
+            result += self.current_char
+            self.advance()
+
+            while self.current_char is not None and self.current_char.isdigit():
+                result += self.current_char
+                self.advance()
+
+            token.type = TokenType.REAL_CONST
+            token.value = float(result)
+        else:
+            token.type = TokenType.INTEGER_CONST
+            token.value = int(result)
+
+        return token
+
+
+
     def _id(self):
         """Handle identifiers and reserved keywords"""
 
@@ -259,7 +291,7 @@ class Lexer:
                 self.advance()
                 return Token(TokenType.GREATER_OR_EQUALS_THAN, TokenType.GREATER_OR_EQUALS_THAN, self.lineno, self.column)
 
-            if self.current_char == ">" and self.peek() == "=":
+            if self.current_char == "<" and self.peek() == "=":
                 self.advance()
                 self.advance()
                 return Token(TokenType.LESS_OR_EQUALS_THAN, TokenType.LESS_OR_EQUALS_THAN, self.lineno, self.column)

@@ -66,7 +66,7 @@ class ActivationRecord:
     def __init__(self, name, type, nesting_level=1,enclosingActivationRecord=None):
         self.name = name
         self.type = type
-        self.nesting_level = nesting_level
+        self.nestingLevel = nesting_level
         self.members = {}
         self.enclosingActivationRecord=enclosingActivationRecord
 
@@ -106,10 +106,13 @@ class ActivationRecord:
         else:
             return False
 
+    def setReturn(self,value):
+        self.returnValue=value
+
     def __str__(self):
         lines = [
             '{level}: {type} {name}'.format(
-                level=self.nesting_level,
+                level=self.nestingLevel,
                 type=self.type.value,
                 name=self.name,
             )
@@ -136,8 +139,8 @@ class ContinueError(Error):
 
 
 class Interpreter(NodeVisitor):
-    def __init__(self, tree):
-        self.tree = tree
+    def __init__(self):
+        # self.tree = tree
         self.call_stack = CallStack()
         self.programActivationRecord=None
 
@@ -234,11 +237,11 @@ class Interpreter(NodeVisitor):
             node.token
         )
         if op == TokenType.PLUS:
-            return +self.visit(node.expr)
+            return +self.visit(node.right)
         elif op == TokenType.MINUS:
-            return -self.visit(node.expr)
+            return -self.visit(node.right)
         elif op==TokenType.NOT:
-            return not self.visit(node.expr)
+            return not self.visit(node.right)
         else:
             raise self.runtimeError(
             ErrorCode.UNEXPECTED_TOKEN,
@@ -369,10 +372,7 @@ class Interpreter(NodeVisitor):
     def visit_Break(self,node):
         raise BreakError(node.token)
 
-    def interpret(self):
-        tree = self.tree
-        if tree is None:
-            return ''
+    def interpret(self,tree):
         self.visit(tree)
         if self.programActivationRecord:
             return self.programActivationRecord.members
@@ -421,8 +421,8 @@ def main():
         print(e.message)
         sys.exit(1)
 
-    interpreter = Interpreter(tree)
-    interpreter.interpret()
+    interpreter = Interpreter()
+    interpreter.interpret(tree)
 
 
 if __name__ == '__main__':
