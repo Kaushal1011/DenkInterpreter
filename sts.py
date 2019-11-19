@@ -175,7 +175,7 @@ class SemanticAnalyzer(NodeVisitor):
         self.visit(node.right)
 
     def visit_ProcedureDecl(self, node):
-        proc_name = node.proc_name
+        proc_name = node.procName
         proc_symbol = ProcedureSymbol(proc_name)
         self.current_scope.insert(proc_symbol)
 
@@ -197,7 +197,7 @@ class SemanticAnalyzer(NodeVisitor):
             self.current_scope.insert(var_symbol)
             proc_symbol.params.append(var_symbol)
 
-        self.visit(node.block_node)
+        self.visit(node.blockNode)
 
         self.log(procedure_scope)
 
@@ -224,7 +224,7 @@ class SemanticAnalyzer(NodeVisitor):
             funcSymbol.params.append(varSymbol)
 
         self.visit_Type(node.returnType)
-        self.visit(node.block_node)
+        self.visit(node.blockNode)
         self.log("{}".format(procedureScope))
         if procedureScope.hasReturnStatement==False:
             self.error(

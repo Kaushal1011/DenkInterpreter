@@ -88,19 +88,19 @@ class Param(AST):
 
 
 class ProcedureDecl(AST):
-    def __init__(self, proc_name, params, block_node, token):
-        self.proc_name = proc_name
+    def __init__(self, procName, params, blockNode, token):
+        self.procName = procName
         self.params = params  # a list of Param nodes
-        self.block_node = block_node
+        self.blockNode = blockNode
         self.token = token
 
 
 class FunctionDecl(AST):
-    def __init__(self, funcName, params, returnType, block_node, token):
+    def __init__(self, funcName, params, returnType, blockNode, token):
         self.funcName = funcName
         self.params = params
         self.returnType = returnType
-        self.block_node = block_node
+        self.blockNode = blockNode
         self.token = token
 
 
@@ -109,6 +109,14 @@ class ProcedureCall(AST):
         self.proc_name = proc_name
         self.actual_params = actual_params  # a list of AST nodes
         self.token = token
+
+class Call(AST):
+    def __init__(self,name,actualParams,token):
+        self.name=name
+        self.actualParams=actualParams
+        self.token=token
+
+        # super().__init__()
 
 
 class Condition(AST):
