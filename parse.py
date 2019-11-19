@@ -110,6 +110,13 @@ class ProcedureCall(AST):
         self.actual_params = actual_params  # a list of AST nodes
         self.token = token
 
+class WritelnCall(AST):
+    def __init__(self,proc_name, actual_params,token):
+        self.proc_name=proc_name
+        self.actual_params=actual_params
+        self.token=token
+
+
 class Call(AST):
     def __init__(self,name,actualParams,token):
         self.name=name
@@ -469,6 +476,7 @@ class Parser():
                   | assignment_statement
                   | empty
         """
+        # print(self.current_token.type)
         if self.current_token.type == TokenType.BEGIN:
             node = self.compound_statement()
         elif self.current_token.type == TokenType.WHILE:
@@ -477,6 +485,8 @@ class Parser():
             node=self.breakStatement()
         elif self.current_token.type ==TokenType.CONTINUE:
             node=self.continueStatement()
+        elif self.current_token.type==TokenType.WRITELN:
+            node=self.writelnStatement()
         elif self.current_token.type == TokenType.IF:
             node=self.conditionStatement()
         elif (self.current_token.type == TokenType.ID and
@@ -568,6 +578,27 @@ class Parser():
         self.eat(TokenType.CONTINUE)
         node=Continue(token)
         return node
+
+    def writelnStatement(self):
+        token=self.current_token
+        self.eat(TokenType.WRITELN)
+        self.eat(TokenType.LPAREN)
+        actual_params = []
+
+        while self.current_token.type != TokenType.RPAREN:
+            node=self.expr()
+            actual_params.append(node)
+
+            if self.current_token.type==TokenType.RPAREN:
+                break
+            elif self.current_token.type==TokenType.COMMA:
+                self.eat(TokenType.COMMA)
+
+
+        self.eat(TokenType.RPAREN)
+
+        return WritelnCall("writeln",actual_params,token)
+
 
     def callStatement(self):
         token = self.current_token
@@ -672,54 +703,7 @@ class Parser():
     #         return node
 
     def parse(self):
-        """
-        program : PROGRAM variable SEMI block DOT
 
-        block : declarations compound_statement
-
-        declarations : (VAR (variable_declaration SEMI)+)? procedure_declaration*
-
-        variable_declaration : ID (COMMA ID)* COLON type_spec
-
-        procedure_declaration :
-             PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI
-
-        formal_params_list : formal_parameters
-                           | formal_parameters SEMI formal_parameter_list
-
-        formal_parameters : ID (COMMA ID)* COLON type_spec
-
-        type_spec : INTEGER | REAL
-
-        compound_statement : BEGIN statement_list END
-
-        statement_list : statement
-                       | statement SEMI statement_list
-
-        statement : compound_statement
-                  | proccall_statement
-                  | assignment_statement
-                  | empty
-
-        proccall_statement : ID LPAREN (expr (COMMA expr)*)? RPAREN
-
-        assignment_statement : variable ASSIGN expr
-
-        empty :
-
-        expr : term ((PLUS | MINUS) term)*
-
-        term : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*
-
-        factor : PLUS factor
-               | MINUS factor
-               | INTEGER_CONST
-               | REAL_CONST
-               | LPAREN expr RPAREN
-               | variable
-
-        variable: ID
-        """
         node = self.program()
         if self.current_token.type != TokenType.EOF:
             self.error(

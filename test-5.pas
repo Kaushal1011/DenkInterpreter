@@ -31,4 +31,5 @@ begin { Main }
     f6 := (1 + 2 <= 3 * 1) and f5;
     t7 := not(1 + 2 < 3) and (1 < 2) or (3 * 2 > 4);
     f7 := not(1 + 2 < 3) or -1 * 2 + 3 > 4 * 5 - 2 * 3;
+    writeln(x,y,t1,f1,t2,f2,t3,f3,f4,t4,t5,f5,t6,f6,t7,f7)
 end.  { Main }

@@ -293,6 +293,10 @@ class SemanticAnalyzer(NodeVisitor):
         for param_node in node.actualParams:
             self.visit(param_node)
 
+    def visit_WritelnCall(self,node):
+        for param_node in node.actual_params:
+            self.visit(param_node)
+
     def visit_Condition(self,node):
         self.visit(node.condition)
         self.visit(node.then)

@@ -25,4 +25,5 @@ begin { Main }
             c := c + 1;
         end;
     end;
+    writeln(a,b,b2,c)
 end.  { Main }

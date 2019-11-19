@@ -298,6 +298,10 @@ class Interpreter(NodeVisitor):
     def visit_ProcedureCall(self, node):
         pass
 
+    def visit_WritelnCall(self,node):
+        for param in node.actual_params:
+            print(self.visit(param))
+
     def visit_Call(self,node):
         name=node.name
         ar=self.call_stack.peek()

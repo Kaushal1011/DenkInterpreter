@@ -15,4 +15,5 @@ begin { Main }
     x := 1;
     y := 0;
     PlusXAndY();
+    writeln(x,y)
 end.  { Main }

@@ -39,7 +39,7 @@ class TokenType(Enum):
     INTEGER_DIV = 'DIV'
     VAR = 'VAR'
     PROCEDURE = 'PROCEDURE'
-    # PRINT         = 'PRINT'
+    WRITELN         = 'WRITELN'
     # STRING = 'STRING'
     BEGIN = 'BEGIN'
     END = 'END'      # marks the end of the block
