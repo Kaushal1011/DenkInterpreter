@@ -1,3 +1,21 @@
+"""SPI - Simple Pascal Interpreter. Part 17."""
+
+import argparse
+import sys
+from enum import Enum
+from base import LexerError
+from base import ParserError
+from base import SemanticError
+from lex import Lexer
+from parse import Parser
+from sts import SemanticAnalyzer
+from lex import TokenType
+from astvisitor import NodeVisitor
+from base import _SHOULD_LOG_STACK
+from base import _SHOULD_LOG_SCOPE
+
+
+
 ###############################################################################
 #                                                                             #
 #  INTERPRETER                                                                #
@@ -162,3 +180,49 @@ class Interpreter(NodeVisitor):
         if tree is None:
             return ''
         return self.visit(tree)
+
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='SPI - Simple Pascal Interpreter'
+    )
+    parser.add_argument('inputfile', help='Pascal source file')
+    parser.add_argument(
+        '--scope',
+        help='Print scope information',
+        action='store_true',
+    )
+    parser.add_argument(
+        '--stack',
+        help='Print call stack',
+        action='store_true',
+    )
+    args = parser.parse_args()
+
+    global _SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK
+    _SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK = args.scope, args.stack
+
+    text = open(args.inputfile, 'r').read()
+
+    lexer = Lexer(text)
+    try:
+        parser = Parser(lexer)
+        tree = parser.parse()
+    except (LexerError, ParserError) as e:
+        print(e.message)
+        sys.exit(1)
+
+    semantic_analyzer = SemanticAnalyzer(_SHOULD_LOG_SCOPE)
+    try:
+        semantic_analyzer.visit(tree)
+    except SemanticError as e:
+        print(e.message)
+        sys.exit(1)
+
+    interpreter = Interpreter(tree)
+    interpreter.interpret()
+
+
+if __name__ == '__main__':
+    main()
