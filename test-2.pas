@@ -8,4 +8,5 @@ end;
 begin { Main }
     x := 1;
     y := 0;
+    writeln(x,y)
 end.  { Main }
