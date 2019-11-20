@@ -1,0 +1,117 @@
+digraph astgraph {
+  node [shape=circle, fontsize=12, fontname="Courier", height=.1];
+  ranksep=.3;
+  edge [arrowsize=.5]
+
+  node1 [label="Program"]
+  node2 [label="Block"]
+  node3 [label="VarDecl"]
+  node4 [label="x"]
+  node3 -> node4
+  node5 [label="INTEGER"]
+  node3 -> node5
+  node6 [label="VarDecl"]
+  node7 [label="y"]
+  node6 -> node7
+  node8 [label="INTEGER"]
+  node6 -> node8
+  node9 [label="ProcDecl:PlusXAndY"]
+  node10 [label="Block"]
+  node11 [label="ProcDecl:PlusYAndX"]
+  node12 [label="Param"]
+  node13 [label="a"]
+  node12 -> node13
+  node14 [label="INTEGER"]
+  node12 -> node14
+  node11 -> node12
+  node15 [label="Param"]
+  node16 [label="b"]
+  node15 -> node16
+  node17 [label="INTEGER"]
+  node15 -> node17
+  node11 -> node15
+  node18 [label="Block"]
+  node19 [label="Compound"]
+  node20 [label=":="]
+  node21 [label="x"]
+  node22 [label="+"]
+  node23 [label="x"]
+  node24 [label="a"]
+  node22 -> node23
+  node22 -> node24
+  node20 -> node21
+  node20 -> node22
+  node19 -> node20
+  node25 [label=":="]
+  node26 [label="y"]
+  node27 [label="+"]
+  node28 [label="y"]
+  node29 [label="b"]
+  node27 -> node28
+  node27 -> node29
+  node25 -> node26
+  node25 -> node27
+  node19 -> node25
+  node30 [label="NoOp"]
+  node19 -> node30
+  node18 -> node19
+  node11 -> node18
+  node31 [label="Compound"]
+  node32 [label=":="]
+  node33 [label="x"]
+  node34 [label="+"]
+  node35 [label="x"]
+  node36 [label="1"]
+  node34 -> node35
+  node34 -> node36
+  node32 -> node33
+  node32 -> node34
+  node31 -> node32
+  node37 [label=":="]
+  node38 [label="y"]
+  node39 [label="+"]
+  node40 [label="y"]
+  node41 [label="1"]
+  node39 -> node40
+  node39 -> node41
+  node37 -> node38
+  node37 -> node39
+  node31 -> node37
+  node42 [label="Call:PlusYAndX"]
+  node43 [label="2"]
+  node42 -> node43
+  node44 [label="3"]
+  node42 -> node44
+  node31 -> node42
+  node45 [label="NoOp"]
+  node31 -> node45
+  node10 -> node11
+  node10 -> node31
+  node9 -> node10
+  node46 [label="Compound"]
+  node47 [label=":="]
+  node48 [label="x"]
+  node49 [label="1"]
+  node47 -> node48
+  node47 -> node49
+  node46 -> node47
+  node50 [label=":="]
+  node51 [label="y"]
+  node52 [label="0"]
+  node50 -> node51
+  node50 -> node52
+  node46 -> node50
+  node53 [label="Call:PlusXAndY"]
+  node46 -> node53
+  node54 [label="write CAll:writeln"]
+  node55 [label="x"]
+  node54 -> node55
+  node56 [label="y"]
+  node54 -> node56
+  node46 -> node54
+  node2 -> node3
+  node2 -> node6
+  node2 -> node9
+  node2 -> node46
+  node1 -> node2
+}

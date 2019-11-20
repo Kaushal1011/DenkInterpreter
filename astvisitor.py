@@ -1,10 +1,12 @@
 ###############################################################################
 #                                                                             #
-#  AST visitors (walkers)                                                     #
+#  AST visitors                                                               #
 #                                                                             #
 ###############################################################################
 
+
 class NodeVisitor:
+    """Contains magic methods to walk ast based on class name"""
     def visit(self, node):
         method_name = 'visit_' + type(node).__name__
         visitor = getattr(self, method_name, self.generic_visit)

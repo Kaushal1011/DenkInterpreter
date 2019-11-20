@@ -1,8 +1,4 @@
-###############################################################################
-#                                                                             #
-#  PARSER                                                                     #
-#                                                                             #
-###############################################################################
+
 from base import ParserError
 from base import ErrorCode
 from lex import TokenType
@@ -11,9 +7,13 @@ from lex import TokenType
 class AST:
     pass
 
+# Classes that extend ast
+
+# Different Types of node classes act differently
+
 
 class BinOp(AST):
-    def __init__(self, left, op:TokenType, right):
+    def __init__(self, left, op: TokenType, right):
         self.left = left
         self.token = self.op = op
         self.right = right
@@ -24,10 +24,11 @@ class Num(AST):
         self.token = token
         self.value = token.value
 
+
 class String(AST):
-    def __init__(self,token):
-        self.token=token
-        self.value=token.value
+    def __init__(self, token):
+        self.token = token
+        self.value = token.value
 
 
 class UnaryOp(AST):
@@ -108,18 +109,20 @@ class FunctionDecl(AST):
         self.blockNode = blockNode
         self.token = token
 
+
 class Readint(AST):
-    def __init__(self,token):
-        self.token=token
+    def __init__(self, token):
+        self.token = token
+
 
 class Readfloat(AST):
-    def __init__(self,token):
-        self.token=token
+    def __init__(self, token):
+        self.token = token
+
 
 class Readstring(AST):
-    def __init__(self,token):
-        self.token=token
-
+    def __init__(self, token):
+        self.token = token
 
 
 class ProcedureCall(AST):
@@ -128,18 +131,19 @@ class ProcedureCall(AST):
         self.actual_params = actual_params  # a list of AST nodes
         self.token = token
 
+
 class WritelnCall(AST):
-    def __init__(self,proc_name, actual_params,token):
-        self.proc_name=proc_name
-        self.actual_params=actual_params
-        self.token=token
+    def __init__(self, proc_name, actual_params, token):
+        self.proc_name = proc_name
+        self.actual_params = actual_params
+        self.token = token
 
 
 class Call(AST):
-    def __init__(self,name,actualParams,token):
-        self.name=name
-        self.actualParams=actualParams
-        self.token=token
+    def __init__(self, name, actualParams, token):
+        self.name = name
+        self.actualParams = actualParams
+        self.token = token
 
         # super().__init__()
 
@@ -193,21 +197,21 @@ class MyElse(AST):
         self.child = child
 
 
-
-
 class MyBoolean(AST):
     def __init__(self, token):
         self.value = bool(token.value)
 
 
 class Parser():
+    """Parse Class Which Generates AST"""
+
     def __init__(self, lexer):
         self.lexer = lexer
         # set current token to the first token taken from the input
         self.current_token = self.get_next_token()
 
     def peek(self):
-        peekChar=self.lexer.current_char
+        peekChar = self.lexer.current_char
         return peekChar
 
     def get_next_token(self):
@@ -234,6 +238,8 @@ class Parser():
                 token=self.current_token,
             )
 
+    # """Functions that create the tree by calling each other"""
+
     def program(self):
         """program : PROGRAM variable SEMI block DOT"""
         self.eat(TokenType.PROGRAM)
@@ -245,6 +251,8 @@ class Parser():
         self.eat(TokenType.DOT)
         return program_node
 
+    # Recurssive precedence hierarchy
+
     def precedence1(self):
         currentToken = self.current_token
         if currentToken.type == TokenType.PLUS:
@@ -253,9 +261,9 @@ class Parser():
         elif currentToken.type == TokenType.MINUS:
             self.eat(TokenType.MINUS)
             return UnaryOp(currentToken, self.precedence1())
-        elif currentToken.type==TokenType.BWISENOT:
+        elif currentToken.type == TokenType.BWISENOT:
             self.eat(TokenType.BWISENOT)
-            return UnaryOp(currentToken,self.precedence1())
+            return UnaryOp(currentToken, self.precedence1())
         elif currentToken.type == TokenType.NOT:
             self.eat(TokenType.NOT)
             return UnaryOp(currentToken, self.precedence1())
@@ -265,7 +273,7 @@ class Parser():
         elif currentToken.type == TokenType.REAL_CONST:
             self.eat(TokenType.REAL_CONST)
             return Num(currentToken)
-        elif currentToken.type==TokenType.STRING:
+        elif currentToken.type == TokenType.STRING:
             self.eat(TokenType.STRING)
             return String(currentToken)
         elif currentToken.type == TokenType.TRUE:
@@ -281,11 +289,11 @@ class Parser():
             return result
         elif self.current_token.type == TokenType.ID and self.peek() == '(':
             return self.callStatement()
-        elif self.current_token.type==TokenType.READINT:
+        elif self.current_token.type == TokenType.READINT:
             return self.readintStatement()
-        elif self.current_token.type==TokenType.READFLOAT:
+        elif self.current_token.type == TokenType.READFLOAT:
             return self.readfloatStatement()
-        elif self.current_token.type==TokenType.READSTRING:
+        elif self.current_token.type == TokenType.READSTRING:
             return self.readstringStatement()
         else:
             return self.variable()
@@ -296,7 +304,7 @@ class Parser():
         while self.current_token.type == TokenType.MUL \
             or self.current_token.type == TokenType.INTEGER_DIV \
                 or self.current_token.type == TokenType.FLOAT_DIV \
-                    or self.current_token.type == TokenType.AND:
+        or self.current_token.type == TokenType.AND:
             op = self.current_token
             self.eat(op.type)
             result = BinOp(result, op, self.precedence1())
@@ -305,61 +313,58 @@ class Parser():
     def precedence3(self):
         left = self.precedence2()
         result = left
-        while self.current_token.type==TokenType.PLUS \
-            or self.current_token.type==TokenType.MINUS \
-                or self.current_token.type==TokenType.OR:
-            op=self.current_token
+        while self.current_token.type == TokenType.PLUS \
+            or self.current_token.type == TokenType.MINUS \
+                or self.current_token.type == TokenType.OR:
+            op = self.current_token
             self.eat(op.type)
-            result=BinOp(result,op,self.precedence2())
+            result = BinOp(result, op, self.precedence2())
         return result
+
     def precedence4(self):
-        left=self.precedence3()
-        result=left
-        while self.current_token.type==TokenType.BWISESHIFTRIGHT \
-            or self.current_token.type==TokenType.BWISESHIFTLEFT:
-            op=self.current_token
+        left = self.precedence3()
+        result = left
+        while self.current_token.type == TokenType.BWISESHIFTRIGHT \
+                or self.current_token.type == TokenType.BWISESHIFTLEFT:
+            op = self.current_token
             self.eat(op.type)
-            result=BinOp(result,op,self.precedence3())
+            result = BinOp(result, op, self.precedence3())
         return result
 
     def precedence5(self):
-        left=self.precedence4()
-        result=left
-        while self.current_token.type==TokenType.EQUALS \
-            or self.current_token.type==TokenType.GREATER_THAN \
-                or self.current_token.type==TokenType.GREATER_OR_EQUALS_THAN \
-                    or self.current_token.type==TokenType.LESS_THAN \
-                        or self.current_token.type==TokenType.LESS_OR_EQUALS_THAN \
-                            or self.current_token.type==TokenType.NOT_EQUALS:
-            op=self.current_token
+        left = self.precedence4()
+        result = left
+        while self.current_token.type == TokenType.EQUALS \
+            or self.current_token.type == TokenType.GREATER_THAN \
+                or self.current_token.type == TokenType.GREATER_OR_EQUALS_THAN \
+        or self.current_token.type == TokenType.LESS_THAN \
+        or self.current_token.type == TokenType.LESS_OR_EQUALS_THAN \
+        or self.current_token.type == TokenType.NOT_EQUALS:
+            op = self.current_token
             self.eat(op.type)
-            result=BinOp(result,op,self.precedence4())
+            result = BinOp(result, op, self.precedence4())
         return result
 
     def precedence6(self):
-        left=self.precedence5()
-        result=left
-        while self.current_token.type==TokenType.BWISEAND or \
-            self.current_token.type==TokenType.BWISEOR or \
-                self.current_token.type==TokenType.BWISEXOR:
-            op=self.current_token
+        left = self.precedence5()
+        result = left
+        while self.current_token.type == TokenType.BWISEAND or \
+            self.current_token.type == TokenType.BWISEOR or \
+                self.current_token.type == TokenType.BWISEXOR:
+            op = self.current_token
             self.eat(op.type)
-            result=BinOp(result,op,self.precedence5())
+            result = BinOp(result, op, self.precedence5())
         return result
 
-
-
     def block(self):
-        """block : declarations compound_statement"""
+
         declaration_nodes = self.declarations()
         compound_statement_node = self.compound_statement()
         node = Block(declaration_nodes, compound_statement_node)
         return node
 
     def declarations(self):
-        """
-        declarations : (VAR (variable_declaration SEMI)+)? procedure_declaration*
-        """
+
         declarations = []
 
         while True:
@@ -385,7 +390,7 @@ class Parser():
         return declarations
 
     def variable_declaration(self):
-        """variable_declaration : ID (COMMA ID)* COLON type_spec"""
+
         var_nodes = [Var(self.current_token)]  # first ID
         self.eat(TokenType.ID)
 
@@ -404,21 +409,18 @@ class Parser():
         return var_declarations
 
     def procedure_declaration(self):
-        """procedure_declaration :
-             PROCEDURE ID (LPAREN formal_parameter_list RPAREN)? SEMI block SEMI
-        """
+
         self.eat(TokenType.PROCEDURE)
         proc_name = self.current_token.value
         self.eat(TokenType.ID)
         params = []
 
-
         params = self.formal_parameter_list()
-
 
         self.eat(TokenType.SEMI)
         block_node = self.block()
-        proc_decl = ProcedureDecl(proc_name, params, block_node, self.current_token)
+        proc_decl = ProcedureDecl(
+            proc_name, params, block_node, self.current_token)
         self.eat(TokenType.SEMI)
         return proc_decl
 
@@ -437,9 +439,8 @@ class Parser():
         funcDecl = FunctionDecl(funcName, params, typ, block_node, token)
         return funcDecl
 
-
     def formal_parameters(self):
-        """ formal_parameters : ID (COMMA ID)* COLON type_spec """
+
         param_nodes = []
 
         param_tokens = [self.current_token]
@@ -459,45 +460,36 @@ class Parser():
         return param_nodes
 
     def formal_parameter_list(self):
-        """ formal_parameter_list : formal_parameters
-                                  | formal_parameters SEMI formal_parameter_list
-        """
-        # procedure Foo();
-        declarations=[]
-        if self.current_token.type==TokenType.LPAREN:
+
+        declarations = []
+        if self.current_token.type == TokenType.LPAREN:
             self.eat(TokenType.LPAREN)
-            while(self.current_token.type==TokenType.ID):
-                vardec=self.formal_parameters()
+            while(self.current_token.type == TokenType.ID):
+                vardec = self.formal_parameters()
                 declarations.extend(vardec)
-                if self.current_token.type==TokenType.RPAREN:
+                if self.current_token.type == TokenType.RPAREN:
                     break
-                elif self.current_token.type==TokenType.SEMI:
+                elif self.current_token.type == TokenType.SEMI:
                     self.eat(TokenType.SEMI)
             self.eat(TokenType.RPAREN)
         return declarations
 
-
-
     def type_spec(self):
-        """type_spec : INTEGER
-                     | REAL
-        """
+
         token = self.current_token
         if self.current_token.type == TokenType.INTEGER:
             self.eat(TokenType.INTEGER)
-        elif self.current_token.type==TokenType.REAL:
+        elif self.current_token.type == TokenType.REAL:
             self.eat(TokenType.REAL)
-        elif self.current_token.type==TokenType.BOOLEAN:
+        elif self.current_token.type == TokenType.BOOLEAN:
             self.eat(TokenType.BOOLEAN)
-        elif self.current_token.type==TokenType.STRING:
+        elif self.current_token.type == TokenType.STRING:
             self.eat(TokenType.STRING)
         node = Type(token)
         return node
 
     def compound_statement(self):
-        """
-        compound_statement: BEGIN statement_list END
-        """
+
         self.eat(TokenType.BEGIN)
         nodes = self.statement_list()
         self.eat(TokenType.END)
@@ -509,10 +501,7 @@ class Parser():
         return root
 
     def statement_list(self):
-        """
-        statement_list : statement
-                       | statement SEMI statement_list
-        """
+
         node = self.statement()
 
         results = [node]
@@ -524,25 +513,19 @@ class Parser():
         return results
 
     def statement(self):
-        """
-        statement : compound_statement
-                  | proccall_statement
-                  | assignment_statement
-                  | empty
-        """
-        # print(self.current_token.type)
+
         if self.current_token.type == TokenType.BEGIN:
             node = self.compound_statement()
         elif self.current_token.type == TokenType.WHILE:
-            node=self.whileStatement()
-        elif self.current_token.type ==TokenType.BREAK:
-            node=self.breakStatement()
-        elif self.current_token.type ==TokenType.CONTINUE:
-            node=self.continueStatement()
-        elif self.current_token.type==TokenType.WRITELN:
-            node=self.writelnStatement()
+            node = self.whileStatement()
+        elif self.current_token.type == TokenType.BREAK:
+            node = self.breakStatement()
+        elif self.current_token.type == TokenType.CONTINUE:
+            node = self.continueStatement()
+        elif self.current_token.type == TokenType.WRITELN:
+            node = self.writelnStatement()
         elif self.current_token.type == TokenType.IF:
-            node=self.conditionStatement()
+            node = self.conditionStatement()
         elif (self.current_token.type == TokenType.ID and
               self.lexer.current_char == '('
               ):
@@ -554,7 +537,7 @@ class Parser():
         return node
 
     def proccall_statement(self):
-        """proccall_statement : ID LPAREN (expr (COMMA expr)*)? RPAREN"""
+
         token = self.current_token
 
         proc_name = self.current_token.value
@@ -580,9 +563,7 @@ class Parser():
         return node
 
     def assignment_statement(self):
-        """
-        assignment_statement : variable ASSIGN expr
-        """
+
         left = self.variable()
         token = self.current_token
         self.eat(TokenType.ASSIGN)
@@ -591,22 +572,22 @@ class Parser():
         return node
 
     def conditionStatement(self):
-        token=self.current_token
+        token = self.current_token
         self.eat(TokenType.IF)
         condition = self.expr()
-        tokenThen=self.current_token
+        tokenThen = self.current_token
         self.eat(TokenType.THEN)
-        thenStatementList=self.statement()
-        then=Then(tokenThen,thenStatementList)
-        node=None
+        thenStatementList = self.statement()
+        then = Then(tokenThen, thenStatementList)
+        node = None
         if self.current_token.type == TokenType.ELSE:
-            myElseToken=self.current_token
+            myElseToken = self.current_token
             self.eat(TokenType.ELSE)
-            myElseStatementList=self.statement()
-            myElse=MyElse(myElseToken,myElseStatementList)
-            node=Condition(token,condition,then,myElse)
+            myElseStatementList = self.statement()
+            myElse = MyElse(myElseToken, myElseStatementList)
+            node = Condition(token, condition, then, myElse)
         else:
-            node=Condition(token,condition,then)
+            node = Condition(token, condition, then)
         return node
 
     def readintStatement(self):
@@ -628,49 +609,47 @@ class Parser():
         return Readstring(self.current_token)
 
     def whileStatement(self):
-        token=self.current_token
+        token = self.current_token
         self.eat(TokenType.WHILE)
-        condition=self.expr()
-        tokenMyDo=self.current_token
+        condition = self.expr()
+        tokenMyDo = self.current_token
         self.eat(TokenType.DO)
-        myDoStatementList=self.statement()
-        then=MyDo(tokenMyDo,myDoStatementList)
+        myDoStatementList = self.statement()
+        then = MyDo(tokenMyDo, myDoStatementList)
 
-        node=While(token,condition,then)
+        node = While(token, condition, then)
         return node
 
     def breakStatement(self):
-        token=self.current_token
+        token = self.current_token
         self.eat(TokenType.BREAK)
-        node=Break(token)
+        node = Break(token)
         return node
 
     def continueStatement(self):
-        token=self.current_token
+        token = self.current_token
         self.eat(TokenType.CONTINUE)
-        node=Continue(token)
+        node = Continue(token)
         return node
 
     def writelnStatement(self):
-        token=self.current_token
+        token = self.current_token
         self.eat(TokenType.WRITELN)
         self.eat(TokenType.LPAREN)
         actual_params = []
 
         while self.current_token.type != TokenType.RPAREN:
-            node=self.expr()
+            node = self.expr()
             actual_params.append(node)
 
-            if self.current_token.type==TokenType.RPAREN:
+            if self.current_token.type == TokenType.RPAREN:
                 break
-            elif self.current_token.type==TokenType.COMMA:
+            elif self.current_token.type == TokenType.COMMA:
                 self.eat(TokenType.COMMA)
-
 
         self.eat(TokenType.RPAREN)
 
-        return WritelnCall("writeln",actual_params,token)
-
+        return WritelnCall("writeln", actual_params, token)
 
     def callStatement(self):
         token = self.current_token
@@ -683,14 +662,13 @@ class Parser():
         actual_params = []
 
         while self.current_token.type != TokenType.RPAREN:
-            node=self.expr()
+            node = self.expr()
             actual_params.append(node)
 
-            if self.current_token.type==TokenType.RPAREN:
+            if self.current_token.type == TokenType.RPAREN:
                 break
-            elif self.current_token.type==TokenType.COMMA:
+            elif self.current_token.type == TokenType.COMMA:
                 self.eat(TokenType.COMMA)
-
 
         self.eat(TokenType.RPAREN)
 
@@ -701,80 +679,24 @@ class Parser():
         )
         return node
 
-
-
     def variable(self):
-        """
-        variable : ID
-        """
+
         node = Var(self.current_token)
         self.eat(TokenType.ID)
         return node
 
     def empty(self):
-        """An empty production"""
+
         return NoOp()
 
     def expr(self):
         return self.precedence6()
 
-    def parseError(self,errorCode,token):
-        return ParserError(errorCode,token,"{}->{}".format(errorCode,token))
-
-    # def term(self):
-    #     """term : factor ((MUL | INTEGER_DIV | FLOAT_DIV) factor)*"""
-    #     node = self.factor()
-
-    #     while self.current_token.type in (
-    #             TokenType.MUL,
-    #             TokenType.INTEGER_DIV,
-    #             TokenType.FLOAT_DIV,
-    #     ):
-    #         token = self.current_token
-    #         if token.type == TokenType.MUL:
-    #             self.eat(TokenType.MUL)
-    #         elif token.type == TokenType.INTEGER_DIV:
-    #             self.eat(TokenType.INTEGER_DIV)
-    #         elif token.type == TokenType.FLOAT_DIV:
-    #             self.eat(TokenType.FLOAT_DIV)
-
-    #         node = BinOp(left=node, op=token, right=self.factor())
-
-    #     return node
-
-    # def factor(self):
-    #     """factor : PLUS factor
-    #               | MINUS factor
-    #               | INTEGER_CONST
-    #               | REAL_CONST
-    #               | LPAREN expr RPAREN
-    #               | variable
-    #     """
-    #     token = self.current_token
-    #     if token.type == TokenType.PLUS:
-    #         self.eat(TokenType.PLUS)
-    #         node = UnaryOp(token, self.factor())
-    #         return node
-    #     elif token.type == TokenType.MINUS:
-    #         self.eat(TokenType.MINUS)
-    #         node = UnaryOp(token, self.factor())
-    #         return node
-    #     elif token.type == TokenType.INTEGER_CONST:
-    #         self.eat(TokenType.INTEGER_CONST)
-    #         return Num(token)
-    #     elif token.type == TokenType.REAL_CONST:
-    #         self.eat(TokenType.REAL_CONST)
-    #         return Num(token)
-    #     elif token.type == TokenType.LPAREN:
-    #         self.eat(TokenType.LPAREN)
-    #         node = self.expr()
-    #         self.eat(TokenType.RPAREN)
-    #         return node
-    #     else:
-    #         node = self.variable()
-    #         return node
+    def parseError(self, errorCode, token):
+        return ParserError(errorCode, token, "{}->{}".format(errorCode, token))
 
     def parse(self):
+        """Main Function That starts parsing"""
 
         node = self.program()
         if self.current_token.type != TokenType.EOF:

@@ -1,13 +1,17 @@
+###############################################################################
+#                                                                             #
+#  Lexer                                                                      #
+#                                                                             #
+###############################################################################
+
 from enum import Enum
 from base import LexerError
 
 
 class TokenType(Enum):
-    # single-character token types
     PLUS = '+'
     MINUS = '-'
     MUL = '*'
-    # FLOAT_DIV = '/'
     LPAREN = '('
     RPAREN = ')'
     SEMI = ';'
@@ -18,12 +22,12 @@ class TokenType(Enum):
     EQUALS = '='
     GREATER_THAN = ">"
     LESS_THAN = "<"
-    BWISEAND="&"
-    BWISEOR="|"
-    BWISEXOR="^"
-    BWISENOT="~"
-    BWISESHIFTLEFT="<<"
-    BWISESHIFTRIGHT=">>"
+    BWISEAND = "&"
+    BWISEOR = "|"
+    BWISEXOR = "^"
+    BWISENOT = "~"
+    BWISESHIFTLEFT = "<<"
+    BWISESHIFTRIGHT = ">>"
 
     # block of reserved words
     PROGRAM = 'PROGRAM'  # marks the beginning of the block
@@ -46,10 +50,10 @@ class TokenType(Enum):
     INTEGER_DIV = 'DIV'
     VAR = 'VAR'
     PROCEDURE = 'PROCEDURE'
-    WRITELN         = 'WRITELN'
+    WRITELN = 'WRITELN'
     READINT = "READINT"
-    READFLOAT="READFLOAT"
-    READSTRING="READSTRING"
+    READFLOAT = "READFLOAT"
+    READSTRING = "READSTRING"
     STRING = 'STRING'
     BEGIN = 'BEGIN'
     END = 'END'      # marks the end of the block
@@ -63,8 +67,6 @@ class TokenType(Enum):
     GREATER_OR_EQUALS_THAN = ">="
     LESS_OR_EQUALS_THAN = "<="
 
-#
-
 
 class Token:
     def __init__(self, type, value, lineno=None, column=None):
@@ -74,12 +76,6 @@ class Token:
         self.column = column
 
     def __str__(self):
-        """String representation of the class instance.
-
-        Example:
-            >>> Token(TokenType.INTEGER, 7, lineno=5, column=10)
-            Token(TokenType.INTEGER, 7, position=5:10)
-        """
         return 'Token({type}, {value}, position={lineno}:{column})'.format(
             type=self.type,
             value=repr(self.value),
@@ -93,21 +89,6 @@ class Token:
 
 def _build_reserved_keywords():
     """Build a dictionary of reserved keywords.
-
-    The function relies on the fact that in the TokenType
-    enumeration the beginning of the block of reserved keywords is
-    marked with PROGRAM and the end of the block is marked with
-    the END keyword.
-
-    Result:
-        {'PROGRAM': <TokenType.PROGRAM: 'PROGRAM'>,
-         'INTEGER': <TokenType.INTEGER: 'INTEGER'>,
-         'REAL': <TokenType.REAL: 'REAL'>,
-         'DIV': <TokenType.INTEGER_DIV: 'DIV'>,
-         'VAR': <TokenType.VAR: 'VAR'>,
-         'PROCEDURE': <TokenType.PROCEDURE: 'PROCEDURE'>,
-         'BEGIN': <TokenType.BEGIN: 'BEGIN'>,
-         'END': <TokenType.END: 'END'>}
     """
     # enumerations support iteration, in definition order
     tt_list = list(TokenType)
@@ -227,8 +208,6 @@ class Lexer:
 
         return token
 
-
-
     def _id(self):
         """Handle identifiers and reserved keywords"""
         # print("HI")
@@ -253,6 +232,7 @@ class Lexer:
         return token
 
     def string(self):
+        """Handles String"""
 
         # Create a new token with current line and column number
         token = Token(type=None, value=None,
@@ -260,29 +240,27 @@ class Lexer:
 
         value = ''
         # print(self.current_char!="\"")
-        if(self.current_char!='\''):
-            token=self._id()
+        if(self.current_char != '\''):
+            token = self._id()
             return token
         self.advance()
 
-        while self.current_char !='\'' :
+        while self.current_char != '\'':
 
             # print(self.current_char)
             value += self.current_char
-            if(self.current_char=='\''):
+            if(self.current_char == '\''):
                 break
             self.advance()
 
-
-
         # print (self.current_char)
-        if(self.current_char!='\''):
+        if(self.current_char != '\''):
             raise self.lexerError()
 
         self.advance()
 
         token.type = TokenType.STRING
-        token.value=value
+        token.value = value
 
         return token
 
@@ -290,15 +268,16 @@ class Lexer:
         return self.text[0:self.pos]
 
     def latestWord(self):
-        processedString=self.getProcessedString()
-        latest10word=processedString[ processedString.length - 20 if len(processedString) >= 20 else 0: len(processedString)]
+        processedString = self.getProcessedString()
+        latest10word = processedString[processedString.length -
+                                       20 if len(processedString) >= 20 else 0: len(processedString)]
         return latest10word
 
     def lexerError(self):
-        return LexerError(None,None,'Lexer error on {} line : {} column : {}'.format(self.current_char,self.lineno,self.column))
+        return LexerError(None, None, 'Lexer error on {} line : {} column : {}'.format(self.current_char, self.lineno, self.column))
 
     def get_next_token(self):
-        """Lexical analyzer (also known as scanner or tokenizer)
+        """
 
         This method is responsible for breaking a sentence
         apart into tokens. One token at a time.
@@ -356,25 +335,20 @@ class Lexer:
                 self.advance()
                 return Token(TokenType.BWISESHIFTRIGHT, TokenType.BWISESHIFTRIGHT, self.lineno, self.column)
 
-            # single-character token
             try:
-                # get enum member by value, e.g.
-                # TokenType(';') --> TokenType.SEMI
+
                 token_type = TokenType(self.current_char)
             except ValueError:
-                # no enum member with value equal to self.current_char
+
                 self.error()
             else:
-                # create a token with a single-character lexeme as its value
                 token = Token(
                     type=token_type,
-                    value=token_type.value,  # e.g. ';', '.', etc
+                    value=token_type.value,
                     lineno=self.lineno,
                     column=self.column,
                 )
                 self.advance()
                 return token
 
-        # EOF (end-of-file) token indicates that there is no more
-        # input left for lexical analysis
         return Token(type=TokenType.EOF, value=None)
