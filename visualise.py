@@ -288,10 +288,15 @@ class ASTVisualizer(NodeVisitor):
         self.ncount+=1
         self.dot_body.append(s)
         node._num=self.ncount
+        child_node=self.visit(node.condition)
         # self.visit(node.child)
-        while(self.visit(node.condition) == True):
+        while(child_node == True):
+            s = '  node{} -> node{}\n'.format(node._num, child_node._num)
+            self.dot_body.append(s)
             try:
-                if self.visit(node.myDo) == True:
+                child2=self.visit(node.myDo)
+                if child2 == True:
+                    s = '  node{} -> node{}\n'.format(node._num, child2._num)
                     break
             except Exception:
                 raise Exception
