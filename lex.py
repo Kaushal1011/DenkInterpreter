@@ -21,6 +21,10 @@ class TokenType(Enum):
     BWISEAND="&"
     BWISEOR="|"
     BWISEXOR="^"
+    BWISENOT="~"
+    BWISESHIFTLEFT="<<"
+    BWISESHIFTRIGHT=">>"
+
     # block of reserved words
     PROGRAM = 'PROGRAM'  # marks the beginning of the block
     INTEGER = 'INTEGER'
@@ -343,6 +347,14 @@ class Lexer:
                 self.advance()
                 self.advance()
                 return Token(TokenType.NOT_EQUALS, TokenType.NOT_EQUALS, self.lineno, self.column)
+            if self.current_char == "<" and self.peek() == "<":
+                self.advance()
+                self.advance()
+                return Token(TokenType.BWISESHIFTLEFT, TokenType.BWISESHIFTLEFT, self.lineno, self.column)
+            if self.current_char == ">" and self.peek() == ">":
+                self.advance()
+                self.advance()
+                return Token(TokenType.BWISESHIFTRIGHT, TokenType.BWISESHIFTRIGHT, self.lineno, self.column)
 
             # single-character token
             try:

@@ -253,6 +253,9 @@ class Parser():
         elif currentToken.type == TokenType.MINUS:
             self.eat(TokenType.MINUS)
             return UnaryOp(currentToken, self.precedence1())
+        elif currentToken.type==TokenType.BWISENOT:
+            self.eat(TokenType.BWISENOT)
+            return UnaryOp(currentToken,self.precedence1())
         elif currentToken.type == TokenType.NOT:
             self.eat(TokenType.NOT)
             return UnaryOp(currentToken, self.precedence1())
@@ -309,9 +312,18 @@ class Parser():
             self.eat(op.type)
             result=BinOp(result,op,self.precedence2())
         return result
-
     def precedence4(self):
         left=self.precedence3()
+        result=left
+        while self.current_token.type==TokenType.BWISESHIFTRIGHT \
+            or self.current_token.type==TokenType.BWISESHIFTLEFT:
+            op=self.current_token
+            self.eat(op.type)
+            result=BinOp(result,op,self.precedence3())
+        return result
+
+    def precedence5(self):
+        left=self.precedence4()
         result=left
         while self.current_token.type==TokenType.EQUALS \
             or self.current_token.type==TokenType.GREATER_THAN \
@@ -321,7 +333,18 @@ class Parser():
                             or self.current_token.type==TokenType.NOT_EQUALS:
             op=self.current_token
             self.eat(op.type)
-            result=BinOp(result,op,self.precedence3())
+            result=BinOp(result,op,self.precedence4())
+        return result
+
+    def precedence6(self):
+        left=self.precedence5()
+        result=left
+        while self.current_token.type==TokenType.BWISEAND or \
+            self.current_token.type==TokenType.BWISEOR or \
+                self.current_token.type==TokenType.BWISEXOR:
+            op=self.current_token
+            self.eat(op.type)
+            result=BinOp(result,op,self.precedence5())
         return result
 
 
@@ -693,7 +716,7 @@ class Parser():
         return NoOp()
 
     def expr(self):
-        return self.precedence4()
+        return self.precedence6()
 
     def parseError(self,errorCode,token):
         return ParserError(errorCode,token,"{}->{}".format(errorCode,token))

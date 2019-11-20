@@ -199,6 +199,16 @@ class Interpreter(NodeVisitor):
             return leftVal // rightVal
         elif node.op.type == TokenType.FLOAT_DIV:
             return float(leftVal) / float(rightVal)
+        elif node.op.type==TokenType.BWISESHIFTLEFT:
+            return leftVal<<rightVal
+        elif node.op.type==TokenType.BWISESHIFTRIGHT:
+            return leftVal>>rightVal
+        elif node.op.type==TokenType.BWISEOR:
+            return leftVal|rightVal
+        elif node.op.type==TokenType.BWISEAND:
+            return leftVal&rightVal
+        elif node.op.type==TokenType.BWISEXOR:
+            return leftVal^rightVal
         elif node.op.type==TokenType.AND:
             return leftVal and rightVal
         elif node.op.type==TokenType.OR:
@@ -245,6 +255,8 @@ class Interpreter(NodeVisitor):
             return -self.visit(node.right)
         elif op==TokenType.NOT:
             return not self.visit(node.right)
+        elif op==TokenType.BWISENOT:
+            return ~self.visit(node.right)
         else:
             raise self.runtimeError(
             ErrorCode.UNEXPECTED_TOKEN,
