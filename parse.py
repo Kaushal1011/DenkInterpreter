@@ -103,6 +103,19 @@ class FunctionDecl(AST):
         self.blockNode = blockNode
         self.token = token
 
+class Readint(AST):
+    def __init__(self,token):
+        self.token=token
+
+class Readfloat(AST):
+    def __init__(self,token):
+        self.token=token
+
+class Readstring(AST):
+    def __init__(self,token):
+        self.token=token
+
+
 
 class ProcedureCall(AST):
     def __init__(self, proc_name, actual_params, token):
@@ -173,6 +186,8 @@ class MyElse(AST):
     def __init__(self, token, child):
         self.token = token
         self.child = child
+
+
 
 
 class MyBoolean(AST):
@@ -255,6 +270,12 @@ class Parser():
             return result
         elif self.current_token.type == TokenType.ID and self.peek() == '(':
             return self.callStatement()
+        elif self.current_token.type==TokenType.READINT:
+            return self.readintStatement()
+        elif self.current_token.type==TokenType.READFLOAT:
+            return self.readfloatStatement()
+        elif self.current_token.type==TokenType.READSTRING:
+            return self.readstringStatement()
         else:
             return self.variable()
 
@@ -554,6 +575,24 @@ class Parser():
         else:
             node=Condition(token,condition,then)
         return node
+
+    def readintStatement(self):
+        self.eat(TokenType.READINT)
+        self.eat(TokenType.LPAREN)
+        self.eat(TokenType.RPAREN)
+        return Readint(self.current_token)
+
+    def readfloatStatement(self):
+        self.eat(TokenType.READFLOAT)
+        self.eat(TokenType.LPAREN)
+        self.eat(TokenType.RPAREN)
+        return Readfloat(self.current_token)
+
+    def readstringStatement(self):
+        self.eat(TokenType.READSTRING)
+        self.eat(TokenType.LPAREN)
+        self.eat(TokenType.RPAREN)
+        return Readstring(self.current_token)
 
     def whileStatement(self):
         token=self.current_token

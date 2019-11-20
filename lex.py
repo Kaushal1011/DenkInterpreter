@@ -40,6 +40,9 @@ class TokenType(Enum):
     VAR = 'VAR'
     PROCEDURE = 'PROCEDURE'
     WRITELN         = 'WRITELN'
+    READINT = "READINT"
+    READFLOAT="READFLOAT"
+    READSTRING="READSTRING"
     # STRING = 'STRING'
     BEGIN = 'BEGIN'
     END = 'END'      # marks the end of the block

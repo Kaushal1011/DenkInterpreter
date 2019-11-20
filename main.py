@@ -260,6 +260,7 @@ class Interpreter(NodeVisitor):
         if ar.type==TokenType.FUNCTION and var_name==ar.name:
             ar.setReturn(var_value)
         else:
+            # print(var_name,var_value)
             ar.setItem(var_name,var_value)
 
 
@@ -301,6 +302,15 @@ class Interpreter(NodeVisitor):
     def visit_WritelnCall(self,node):
         for param in node.actual_params:
             print(self.visit(param))
+
+    def visit_Readint(self,node):
+        return int(input())
+
+    def visit_Readfloat(self,node):
+        return float(input())
+
+    def visit_Readstring(self,node):
+        return str(input())
 
     def visit_Call(self,node):
         name=node.name

@@ -293,6 +293,15 @@ class SemanticAnalyzer(NodeVisitor):
         for param_node in node.actualParams:
             self.visit(param_node)
 
+    def visit_Readint(self,node):
+        return
+
+    def visit_Readfloat(self,node):
+        return
+
+    def visit_Readstring(self,node):
+        return
+
     def visit_WritelnCall(self,node):
         for param_node in node.actual_params:
             self.visit(param_node)
