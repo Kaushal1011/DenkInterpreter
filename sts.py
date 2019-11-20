@@ -282,6 +282,9 @@ class SemanticAnalyzer(NodeVisitor):
     def visit_Num(self, node):
         pass
 
+    def visit_String(self,node):
+        pass
+
     def visit_UnaryOp(self, node):
         self.visit(node.right)
 

@@ -18,6 +18,9 @@ class TokenType(Enum):
     EQUALS = '='
     GREATER_THAN = ">"
     LESS_THAN = "<"
+    BWISEAND="&"
+    BWISEOR="|"
+    BWISEXOR="^"
     # block of reserved words
     PROGRAM = 'PROGRAM'  # marks the beginning of the block
     INTEGER = 'INTEGER'
@@ -43,7 +46,7 @@ class TokenType(Enum):
     READINT = "READINT"
     READFLOAT="READFLOAT"
     READSTRING="READSTRING"
-    # STRING = 'STRING'
+    STRING = 'STRING'
     BEGIN = 'BEGIN'
     END = 'END'      # marks the end of the block
     # misc
@@ -224,7 +227,7 @@ class Lexer:
 
     def _id(self):
         """Handle identifiers and reserved keywords"""
-
+        # print("HI")
         # Create a new token with current line and column number
         token = Token(type=None, value=None,
                       lineno=self.lineno, column=self.column)
@@ -242,6 +245,40 @@ class Lexer:
             # reserved keyword
             token.type = token_type
             token.value = value.upper()
+
+        return token
+
+    def string(self):
+
+        # Create a new token with current line and column number
+        token = Token(type=None, value=None,
+                      lineno=self.lineno, column=self.column)
+
+        value = ''
+        # print(self.current_char!="\"")
+        if(self.current_char!='\''):
+            token=self._id()
+            return token
+        self.advance()
+
+        while self.current_char !='\'' :
+
+            # print(self.current_char)
+            value += self.current_char
+            if(self.current_char=='\''):
+                break
+            self.advance()
+
+
+
+        # print (self.current_char)
+        if(self.current_char!='\''):
+            raise self.lexerError()
+
+        self.advance()
+
+        token.type = TokenType.STRING
+        token.value=value
 
         return token
 
@@ -274,6 +311,9 @@ class Lexer:
 
             if self.current_char.isalpha():
                 return self._id()
+
+            if self.current_char == '\'':
+                return self.string()
 
             if self.current_char.isdigit():
                 return self.number()

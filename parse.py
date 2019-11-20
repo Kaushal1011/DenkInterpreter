@@ -24,6 +24,11 @@ class Num(AST):
         self.token = token
         self.value = token.value
 
+class String(AST):
+    def __init__(self,token):
+        self.token=token
+        self.value=token.value
+
 
 class UnaryOp(AST):
     def __init__(self, op, right):
@@ -257,6 +262,9 @@ class Parser():
         elif currentToken.type == TokenType.REAL_CONST:
             self.eat(TokenType.REAL_CONST)
             return Num(currentToken)
+        elif currentToken.type==TokenType.STRING:
+            self.eat(TokenType.STRING)
+            return String(currentToken)
         elif currentToken.type == TokenType.TRUE:
             self.eat(TokenType.TRUE)
             return MyBoolean(currentToken)
@@ -456,8 +464,10 @@ class Parser():
             self.eat(TokenType.INTEGER)
         elif self.current_token.type==TokenType.REAL:
             self.eat(TokenType.REAL)
-        else:
+        elif self.current_token.type==TokenType.BOOLEAN:
             self.eat(TokenType.BOOLEAN)
+        elif self.current_token.type==TokenType.STRING:
+            self.eat(TokenType.STRING)
         node = Type(token)
         return node
 

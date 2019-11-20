@@ -225,6 +225,9 @@ class Interpreter(NodeVisitor):
     def visit_Num(self, node):
         return node.value
 
+    def visit_String(self, node):
+        return node.value
+
     def visit_MyBoolean(self,node):
         return node.value
 
@@ -419,8 +422,10 @@ def main():
     _SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK = args.scope, args.stack
 
     text = open(args.inputfile, 'r').read()
+    # print(text)
 
     lexer = Lexer(text)
+
     try:
         parser = Parser(lexer)
         tree = parser.parse()
