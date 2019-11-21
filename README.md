@@ -1,4 +1,4 @@
-# DenkInetrpreter
+# DenkInterpreter
 
 Interpreter Made for Pascal Like Language in Python. Ships with text edit ironically made in java.
 [DenkInterpreter on github](https://github.com/Kaushal1011/DenkInterpreter)
