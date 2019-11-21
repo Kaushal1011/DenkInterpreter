@@ -10,4 +10,4 @@
 - ![graph7](astGraphs/test8.png)
 - ![graph8](astGraphs/test9.png)
 - ![graph9](astGraphs/test10.png)
-- ![graph11](astGraphs/testfucntion.png)
+- ![graph11](astGraphs/testfunction.png)
