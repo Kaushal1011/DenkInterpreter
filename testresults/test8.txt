@@ -1,1 +1,1 @@
-6
+ParserError: Unexpected token -> Token(TokenType.ID, 'x', position=10:5)

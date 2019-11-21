@@ -56,10 +56,14 @@ digraph astgraph {
   node27 -> node29
   node23 -> node27
   node30 [label="write CAll:writeln"]
-  node31 [label="x"]
+  node31 [label="x ="]
   node30 -> node31
-  node32 [label="y"]
+  node32 [label="x"]
   node30 -> node32
+  node33 [label="y ="]
+  node30 -> node33
+  node34 [label="y"]
+  node30 -> node34
   node23 -> node30
   node2 -> node3
   node2 -> node6

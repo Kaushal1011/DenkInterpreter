@@ -55,20 +55,26 @@ digraph astgraph {
   node27 -> node28
   node27 -> node29
   node23 -> node27
-  node30 [label="write CAll:writeln"]
-  node31 [label="|"]
-  node32 [label="x"]
-  node33 [label="y"]
-  node31 -> node32
-  node31 -> node33
-  node30 -> node31
-  node34 [label="TokenType.BWISESHIFTLEFT"]
-  node35 [label="1"]
-  node36 [label="2"]
-  node34 -> node35
-  node34 -> node36
-  node30 -> node34
+  node30 [label="Call:PlusXAndY"]
   node23 -> node30
+  node31 [label="write CAll:writeln"]
+  node32 [label="x|y"]
+  node31 -> node32
+  node33 [label="|"]
+  node34 [label="x"]
+  node35 [label="y"]
+  node33 -> node34
+  node33 -> node35
+  node31 -> node33
+  node36 [label="1<<2"]
+  node31 -> node36
+  node37 [label="TokenType.BWISESHIFTLEFT"]
+  node38 [label="1"]
+  node39 [label="2"]
+  node37 -> node38
+  node37 -> node39
+  node31 -> node37
+  node23 -> node31
   node2 -> node3
   node2 -> node6
   node2 -> node9

@@ -1,3 +1,1 @@
-Hello
-8
-HMM
+ParserError: Unexpected token -> Token(TokenType.ID, 'x', position=11:5)

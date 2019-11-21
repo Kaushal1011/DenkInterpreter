@@ -100,14 +100,14 @@ digraph astgraph {
   node51 -> node55
   node58 [label=":="]
   node59 [label="t1"]
-  node60 [label="<parse.MyBoolean object at 0x0000024EBD4BDFC8>"]
+  node60 [label="<parse.MyBoolean object at 0x0000012537261308>"]
   node58 -> node59
   node58 -> node60
   node51 -> node58
   node61 [label=":="]
   node62 [label="f1"]
   node63 [label="unary NOT"]
-  node64 [label="<parse.MyBoolean object at 0x0000024EBD502208>"]
+  node64 [label="<parse.MyBoolean object at 0x0000012537261508>"]
   node63 -> node64
   node61 -> node62
   node61 -> node63
@@ -124,7 +124,7 @@ digraph astgraph {
   node70 [label="f2"]
   node71 [label="AND"]
   node72 [label="t1"]
-  node73 [label="<parse.MyBoolean object at 0x0000024EBD5027C8>"]
+  node73 [label="<parse.MyBoolean object at 0x0000012537261AC8>"]
   node71 -> node72
   node71 -> node73
   node69 -> node70

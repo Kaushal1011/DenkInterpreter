@@ -27,23 +27,31 @@ digraph astgraph {
   node15 [label="*"]
   node16 [label="+"]
   node17 [label="y"]
-  node18 [label="3"]
+  node18 [label="/"]
+  node19 [label="3"]
+  node20 [label="2"]
+  node18 -> node19
+  node18 -> node20
   node16 -> node17
   node16 -> node18
-  node19 [label="3"]
+  node21 [label="3"]
   node15 -> node16
-  node15 -> node19
+  node15 -> node21
   node13 -> node14
   node13 -> node15
   node9 -> node13
-  node20 [label="write CAll:writeln"]
-  node21 [label="x"]
-  node20 -> node21
-  node22 [label="y"]
-  node20 -> node22
-  node9 -> node20
-  node23 [label="NoOp"]
-  node9 -> node23
+  node22 [label="write CAll:writeln"]
+  node23 [label="x="]
+  node22 -> node23
+  node24 [label="x"]
+  node22 -> node24
+  node25 [label="y="]
+  node22 -> node25
+  node26 [label="y"]
+  node22 -> node26
+  node9 -> node22
+  node27 [label="NoOp"]
+  node9 -> node27
   node2 -> node3
   node2 -> node6
   node2 -> node9

@@ -104,10 +104,14 @@ digraph astgraph {
   node53 [label="Call:PlusXAndY"]
   node46 -> node53
   node54 [label="write CAll:writeln"]
-  node55 [label="x"]
+  node55 [label="X="]
   node54 -> node55
-  node56 [label="y"]
+  node56 [label="x"]
   node54 -> node56
+  node57 [label="Y="]
+  node54 -> node57
+  node58 [label="y"]
+  node54 -> node58
   node46 -> node54
   node2 -> node3
   node2 -> node6

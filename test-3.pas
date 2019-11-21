@@ -11,5 +11,5 @@ begin { Main }
     PlusXAndY();
     x:=x+2;
     y:=y+2;
-    writeln(x,y)
+    writeln('x=',x,'y=',y)
 end.  { Main }

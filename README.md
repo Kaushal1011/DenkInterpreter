@@ -1,6 +1,12 @@
 # DenkInetrpreter
 
 Interpreter Made for Pascal Like Language in Python. Ships with text edit ironically made in java.
+[DenkInterpreter on github](https://github.com/Kaushal1011/DenkInterpreter)
+
+## Collaborators
+
+- [Kaushal Patil](https://github.com/Kaushal1011)
+- [Dhruvil Dave](https://github.com/dhruvildave)
 
 ## DenkInterpreter Cli
 
@@ -59,6 +65,20 @@ About tests:
 - test-error-1 : to check error handling abilities of langauge
 
 executed test results are saved in testresults directory
+
+To create the ast of the program (using graphviz library) run:
+
+- Linux
+
+```shell
+python3 visualise.py test-10.pas > test-10.dot && dot -Tpng -o test-10.png test-10.dot
+```
+
+- Windows (with pyhton installed as python3)
+
+```shell
+python visualise.py test-10.pas > test-10.dot && dot -Tpng -o test-10.png test-10.dot
+```
 
 example code that gives an idea about the language
 
@@ -119,20 +139,6 @@ begin { Main }
 
     writeln('x=',x,'y=',y,'z=',z);
 end.  { Main }
-```
-
-To create the ast of the program (using graphviz library) run:
-
-- Linux
-
-```shell
-python3 visualise.py test-10.pas > test-10.dot && dot -Tpng -o test-10.png test-10.dot
-```
-
-- Windows (with pyhton installed as python3)
-
-```shell
-python visualise.py test-10.pas > test-10.dot && dot -Tpng -o test-10.png test-10.dot
 ```
 
 example image of tree

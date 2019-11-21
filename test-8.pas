@@ -9,5 +9,5 @@ begin { Main }
     writeln('enter an integer')
     x := readint();
     y := 2;
-    writeln(x+y)
+    writeln('x+y',x+y)
 end.  { Main }

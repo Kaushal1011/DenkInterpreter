@@ -25,5 +25,5 @@ begin { Main }
             c := 3
     else
         c := 4;
-    writeln(a,b,c,4)
+    writeln('a',a,'b',b,'b',c,'const 4',4)
 end.  { Main }

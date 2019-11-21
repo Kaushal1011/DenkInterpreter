@@ -7,6 +7,7 @@ begin
     y := y + 1;
 end;
 begin { Main }
+    writeln('Enter an intger')
     x := readint();
     y := 2;
     a := 'HMM';

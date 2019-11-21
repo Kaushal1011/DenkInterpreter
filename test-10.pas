@@ -8,5 +8,6 @@ end;
 begin { Main }
     x := 1;
     y := 0;
-    writeln(x|y,1<<2)
+    PlusXAndY();
+    writeln('x|y',x|y,'1<<2',1<<2)
 end.  { Main }

@@ -20,4 +20,6 @@ begin { Main }
     y := 0;
     PlusXAndY();
     x := PlusBy1(x);
+    writeln('x|y',x|y,'1<<2',1<<2)
+
 end.  { Main }
