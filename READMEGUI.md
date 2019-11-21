@@ -26,4 +26,4 @@ run LightIde.java
 
 example use case and output (keep scrolling)
 
-![GUI](GUI.png)
+![GUI](GUI.PNG)
