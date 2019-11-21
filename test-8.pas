@@ -6,6 +6,7 @@ begin
     y := y + 1;
 end;
 begin { Main }
+    writeln('enter an integer')
     x := readint();
     y := 2;
     writeln(x+y)
