@@ -8,14 +8,14 @@ Interpreter Made for Pascal Like Language in Python. Ships with text editor iron
 - [Kaushal Patil](https://github.com/Kaushal1011)
 - [Dhruvil Dave](https://github.com/dhruvildave)
 
-## DenkInterpreter Cli
+## DenkInterpreter CLI
 
 ___for support on langugae see DENK.md/DENK.pdf___
 
 ### requirements
 
 - Python3
-- Java min JDK8,optimun JDK [For DenkEditor(GUI)]
+- Java min JDK8,optimun JDK 11 [For DenkEditor(GUI)]
 
 ___for instruction on running Denk Interpreter text editor see READMEGUI.md/READMEGUI.pdf___
 
@@ -29,7 +29,7 @@ To run on any of the test
 python3 interpreter.py test-10.pas
 ```
 
-- Windows (with pyhton installed as python3)
+- Windows (with python installed as python3)
 
 ```shell
 python interpreter.py test-10.pas
@@ -43,7 +43,7 @@ To see call stack
 python3 interpreter.py test-10.pas  --stack
 ```
 
-- Windows (with pyhton installed as python3)
+- Windows (with python installed as python3)
 
 ```shell
 python interpreter.py test-10.pas --stack
