@@ -5,8 +5,8 @@ Interpreter Made for Pascal Like Language in Python. Ships with text editor iron
 
 ## Collaborators
 
-- [Kaushal Patil AU1841040](https://github.com/Kaushal1011)
-- [Dhruvil Dave AU1841003](https://github.com/dhruvildave)
+- [Kaushal Patil](https://github.com/Kaushal1011)
+- [Dhruvil Dave](https://github.com/dhruvildave)
 
 ## DenkInterpreter Cli
 
