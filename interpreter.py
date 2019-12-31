@@ -1,4 +1,4 @@
-"""SPI - Simple Pascal Interpreter. Part 17."""
+
 
 import argparse
 import sys
