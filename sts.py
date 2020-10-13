@@ -3,11 +3,8 @@
 #  SYMBOLS, TABLES, SEMANTIC ANALYSIS                                         #
 #                                                                             #
 ###############################################################################
-from base import _SHOULD_LOG_SCOPE
-from base import _SHOULD_LOG_STACK
 from astvisitor import NodeVisitor
-from base import ErrorCode
-from base import SemanticError
+from base import _SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK, ErrorCode, SemanticError
 from lex import TokenType
 
 
@@ -23,9 +20,7 @@ class VarSymbol(Symbol):
 
     def __str__(self):
         return "<{class_name}(name='{name}', type='{type}')>".format(
-            class_name=self.__class__.__name__,
-            name=self.name,
-            type=self.type,
+            class_name=self.__class__.__name__, name=self.name, type=self.type,
         )
 
     __repr__ = __str__
@@ -40,8 +35,7 @@ class BuiltinTypeSymbol(Symbol):
 
     def __repr__(self):
         return "<{class_name}(name='{name}')>".format(
-            class_name=self.__class__.__name__,
-            name=self.name,
+            class_name=self.__class__.__name__, name=self.name,
         )
 
 
@@ -52,10 +46,8 @@ class ProcedureSymbol(Symbol):
         self.params = params if params is not None else []
 
     def __str__(self):
-        return '<{class_name}(name={name}, parameters={params})>'.format(
-            class_name=self.__class__.__name__,
-            name=self.name,
-            params=self.params,
+        return "<{class_name}(name={name}, parameters={params})>".format(
+            class_name=self.__class__.__name__, name=self.name, params=self.params,
         )
 
     __repr__ = __str__
@@ -73,28 +65,26 @@ class ScopedSymbolTable:
         self._init_builtins()
 
     def _init_builtins(self):
-        self.insert(BuiltinTypeSymbol('INTEGER'))
-        self.insert(BuiltinTypeSymbol('REAL'))
+        self.insert(BuiltinTypeSymbol("INTEGER"))
+        self.insert(BuiltinTypeSymbol("REAL"))
 
     def __str__(self):
-        h1 = 'SCOPE (SCOPED SYMBOL TABLE)'
-        lines = ['\n', h1, '=' * len(h1)]
+        h1 = "SCOPE (SCOPED SYMBOL TABLE)"
+        lines = ["\n", h1, "=" * len(h1)]
         for header_name, header_value in (
-            ('Scope name', self.scope_name),
-            ('Scope level', self.scope_level),
-            ('Enclosing scope',
-             self.enclosing_scope.scope_name if self.enclosing_scope else None
-             )
+            ("Scope name", self.scope_name),
+            ("Scope level", self.scope_level),
+            (
+                "Enclosing scope",
+                self.enclosing_scope.scope_name if self.enclosing_scope else None,
+            ),
         ):
-            lines.append('%-15s: %s' % (header_name, header_value))
-        h2 = 'Scope (Scoped symbol table) contents'
-        lines.extend([h2, '-' * len(h2)])
-        lines.extend(
-            ('%7s: %r' % (key, value))
-            for key, value in self._symbols.items()
-        )
-        lines.append('\n')
-        s = '\n'.join(lines)
+            lines.append("%-15s: %s" % (header_name, header_value))
+        h2 = "Scope (Scoped symbol table) contents"
+        lines.extend([h2, "-" * len(h2)])
+        lines.extend(("%7s: %r" % (key, value)) for key, value in self._symbols.items())
+        lines.append("\n")
+        s = "\n".join(lines)
         return s
 
     __repr__ = __str__
@@ -104,11 +94,11 @@ class ScopedSymbolTable:
             print(msg)
 
     def insert(self, symbol):
-        self.log(f'Insert: {symbol.name}')
+        self.log(f"Insert: {symbol.name}")
         self._symbols[symbol.name] = symbol
 
     def lookup(self, name, current_scope_only=False):
-        self.log(f'Lookup: {name}. (Scope name: {self.scope_name})')
+        self.log(f"Lookup: {name}. (Scope name: {self.scope_name})")
         # 'symbol' is either an instance of the Symbol class or None
         symbol = self._symbols.get(name)
 
@@ -136,7 +126,7 @@ class SemanticAnalyzer(NodeVisitor):
         raise SemanticError(
             error_code=error_code,
             token=token,
-            message=f'{error_code.value} -> {token}',
+            message=f"{error_code.value} -> {token}",
         )
 
     def visit_Block(self, node):
@@ -145,9 +135,9 @@ class SemanticAnalyzer(NodeVisitor):
         self.visit(node.compound_statement)
 
     def visit_Program(self, node):
-        self.log('ENTER scope: global')
+        self.log("ENTER scope: global")
         global_scope = ScopedSymbolTable(
-            scope_name='global',
+            scope_name="global",
             scopeType=TokenType.PROGRAM,
             scope_level=1,
             enclosing_scope=self.current_scope,  # None
@@ -160,7 +150,7 @@ class SemanticAnalyzer(NodeVisitor):
         self.log(global_scope)
 
         self.current_scope = self.current_scope.enclosing_scope
-        self.log('LEAVE scope: global')
+        self.log("LEAVE scope: global")
 
     def visit_Compound(self, node):
         for child in node.children:
@@ -181,13 +171,13 @@ class SemanticAnalyzer(NodeVisitor):
         proc_symbol = ProcedureSymbol(proc_name)
         self.current_scope.insert(proc_symbol)
 
-        self.log(f'ENTER scope: {proc_name}')
+        self.log(f"ENTER scope: {proc_name}")
         # Scope for parameters and local variables
         procedure_scope = ScopedSymbolTable(
             scope_name=proc_name,
             scopeType=TokenType.PROCEDURE,
             scope_level=self.current_scope.scope_level + 1,
-            enclosing_scope=self.current_scope
+            enclosing_scope=self.current_scope,
         )
         self.current_scope = procedure_scope
 
@@ -204,7 +194,7 @@ class SemanticAnalyzer(NodeVisitor):
         self.log(procedure_scope)
 
         self.current_scope = self.current_scope.enclosing_scope
-        self.log(f'LEAVE scope: {proc_name}')
+        self.log(f"LEAVE scope: {proc_name}")
 
     def visit_FunctionDecl(self, node):
         funcName = node.funcName
@@ -215,7 +205,7 @@ class SemanticAnalyzer(NodeVisitor):
             funcName,
             TokenType.FUNCTION,
             self.current_scope.scope_level + 1,
-            self.current_scope
+            self.current_scope,
         )
         self.current_scope = procedureScope
         for param in node.params:
@@ -230,12 +220,9 @@ class SemanticAnalyzer(NodeVisitor):
         self.visit(node.blockNode)
         self.log("{}".format(procedureScope))
         if procedureScope.hasReturnStatement == False:
-            self.error(
-                ErrorCode.MISSING_RETURN,
-                node.token
-            )
+            self.error(ErrorCode.MISSING_RETURN, node.token)
         self.current_scope = self.current_scope.enclosing_scope
-        self.log('Leave scope : {}'.format(funcName))
+        self.log("Leave scope : {}".format(funcName))
 
     def visit_VarDecl(self, node):
         type_name = node.type_node.value
@@ -250,8 +237,7 @@ class SemanticAnalyzer(NodeVisitor):
         # with the same name
         if self.current_scope.lookup(var_name, current_scope_only=True):
             self.error(
-                error_code=ErrorCode.DUPLICATE_ID,
-                token=node.var_node.token,
+                error_code=ErrorCode.DUPLICATE_ID, token=node.var_node.token,
             )
 
         self.current_scope.insert(var_symbol)
@@ -264,7 +250,10 @@ class SemanticAnalyzer(NodeVisitor):
         varName = node.left.value
         currentScope = self.current_scope
         # priprint(varName,currentScope.scopeType,currentScope.scope_name)
-        if currentScope.scopeType == TokenType.FUNCTION and varName == currentScope.scope_name:
+        if (
+            currentScope.scopeType == TokenType.FUNCTION
+            and varName == currentScope.scope_name
+        ):
             currentScope.hasReturnStatement = True
         else:
             VarSymbol = self.current_scope.lookup(varName)
@@ -311,7 +300,7 @@ class SemanticAnalyzer(NodeVisitor):
     def visit_Condition(self, node):
         self.visit(node.condition)
         self.visit(node.then)
-        if(node.myElse != None):
+        if node.myElse != None:
             self.visit(node.myElse)
 
     def visit_Then(self, node):

@@ -5,21 +5,22 @@
 ###############################################################################
 
 from enum import Enum
+
 from base import LexerError
 
 
 class TokenType(Enum):
-    PLUS = '+'
-    MINUS = '-'
-    MUL = '*'
-    LPAREN = '('
-    RPAREN = ')'
-    SEMI = ';'
-    DOT = '.'
-    COLON = ':'
-    COMMA = ','
-    FLOAT_DIV = '/'
-    EQUALS = '='
+    PLUS = "+"
+    MINUS = "-"
+    MUL = "*"
+    LPAREN = "("
+    RPAREN = ")"
+    SEMI = ";"
+    DOT = "."
+    COLON = ":"
+    COMMA = ","
+    FLOAT_DIV = "/"
+    EQUALS = "="
     GREATER_THAN = ">"
     LESS_THAN = "<"
     BWISEAND = "&"
@@ -30,40 +31,40 @@ class TokenType(Enum):
     BWISESHIFTRIGHT = ">>"
 
     # block of reserved words
-    PROGRAM = 'PROGRAM'  # marks the beginning of the block
-    INTEGER = 'INTEGER'
-    BOOLEAN = 'BOOLEAN'
-    TRUE = 'TRUE'
-    FALSE = 'FALSE'
-    AND = 'AND'
-    OR = 'OR'
-    NOT = 'NOT'
-    FUNCTION = 'FUNCTION'
-    IF = 'IF'
-    THEN = 'THEN'
-    ELSE = 'ELSE'
-    WHILE = 'WHILE'
-    DO = 'DO'
-    BREAK = 'BREAK'
-    CONTINUE = 'CONTINUE'
-    REAL = 'REAL'
-    INTEGER_DIV = 'DIV'
-    VAR = 'VAR'
-    PROCEDURE = 'PROCEDURE'
-    WRITELN = 'WRITELN'
+    PROGRAM = "PROGRAM"  # marks the beginning of the block
+    INTEGER = "INTEGER"
+    BOOLEAN = "BOOLEAN"
+    TRUE = "TRUE"
+    FALSE = "FALSE"
+    AND = "AND"
+    OR = "OR"
+    NOT = "NOT"
+    FUNCTION = "FUNCTION"
+    IF = "IF"
+    THEN = "THEN"
+    ELSE = "ELSE"
+    WHILE = "WHILE"
+    DO = "DO"
+    BREAK = "BREAK"
+    CONTINUE = "CONTINUE"
+    REAL = "REAL"
+    INTEGER_DIV = "DIV"
+    VAR = "VAR"
+    PROCEDURE = "PROCEDURE"
+    WRITELN = "WRITELN"
     READINT = "READINT"
     READFLOAT = "READFLOAT"
     READSTRING = "READSTRING"
-    STRING = 'STRING'
-    BEGIN = 'BEGIN'
-    END = 'END'      # marks the end of the block
+    STRING = "STRING"
+    BEGIN = "BEGIN"
+    END = "END"  # marks the end of the block
     # misc
-    ID = 'ID'
-    INTEGER_CONST = 'INTEGER_CONST'
-    REAL_CONST = 'REAL_CONST'
-    ASSIGN = ':='
-    EOF = 'EOF'
-    NOT_EQUALS = '<>'
+    ID = "ID"
+    INTEGER_CONST = "INTEGER_CONST"
+    REAL_CONST = "REAL_CONST"
+    ASSIGN = ":="
+    EOF = "EOF"
+    NOT_EQUALS = "<>"
     GREATER_OR_EQUALS_THAN = ">="
     LESS_OR_EQUALS_THAN = "<="
 
@@ -76,7 +77,7 @@ class Token:
         self.column = column
 
     def __str__(self):
-        return 'Token({type}, {value}, position={lineno}:{column})'.format(
+        return "Token({type}, {value}, position={lineno}:{column})".format(
             type=self.type,
             value=repr(self.value),
             lineno=self.lineno,
@@ -96,7 +97,7 @@ def _build_reserved_keywords():
     end_index = tt_list.index(TokenType.END)
     reserved_keywords = {
         token_type.value: token_type
-        for token_type in tt_list[start_index:end_index + 1]
+        for token_type in tt_list[start_index : end_index + 1]
     }
     return reserved_keywords
 
@@ -117,15 +118,13 @@ class Lexer:
 
     def error(self):
         s = "Lexer error on '{lexeme}' line: {lineno} column: {column}".format(
-            lexeme=self.current_char,
-            lineno=self.lineno,
-            column=self.column,
+            lexeme=self.current_char, lineno=self.lineno, column=self.column,
         )
         raise LexerError(message=s)
 
     def advance(self):
         """Advance the `pos` pointer and set the `current_char` variable."""
-        if self.current_char == '\n':
+        if self.current_char == "\n":
             self.lineno += 1
             self.column = 0
 
@@ -148,7 +147,7 @@ class Lexer:
             self.advance()
 
     def skip_comment(self):
-        while self.current_char != '}':
+        while self.current_char != "}":
             self.advance()
         self.advance()  # the closing curly brace
 
@@ -156,15 +155,14 @@ class Lexer:
         """Return a (multidigit) integer or float consumed from the input."""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None,
-                      lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
 
-        result = ''
+        result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
 
-        if self.current_char == '.':
+        if self.current_char == ".":
             result += self.current_char
             self.advance()
 
@@ -184,15 +182,14 @@ class Lexer:
         """Return a (multidigit) integer or float consumed from the input."""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None,
-                      lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
 
-        result = ''
+        result = ""
         while self.current_char is not None and self.current_char.isdigit():
             result += self.current_char
             self.advance()
 
-        if self.current_char == '.':
+        if self.current_char == ".":
             result += self.current_char
             self.advance()
 
@@ -212,10 +209,9 @@ class Lexer:
         """Handle identifiers and reserved keywords"""
         # print("HI")
         # Create a new token with current line and column number
-        token = Token(type=None, value=None,
-                      lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
 
-        value = ''
+        value = ""
         while self.current_char is not None and self.current_char.isalnum():
             value += self.current_char
             self.advance()
@@ -235,26 +231,25 @@ class Lexer:
         """Handles String"""
 
         # Create a new token with current line and column number
-        token = Token(type=None, value=None,
-                      lineno=self.lineno, column=self.column)
+        token = Token(type=None, value=None, lineno=self.lineno, column=self.column)
 
-        value = ''
+        value = ""
         # print(self.current_char!="\"")
-        if(self.current_char != '\''):
+        if self.current_char != "'":
             token = self._id()
             return token
         self.advance()
 
-        while self.current_char != '\'':
+        while self.current_char != "'":
 
             # print(self.current_char)
             value += self.current_char
-            if(self.current_char == '\''):
+            if self.current_char == "'":
                 break
             self.advance()
 
         # print (self.current_char)
-        if(self.current_char != '\''):
+        if self.current_char != "'":
             raise self.lexerError()
 
         self.advance()
@@ -265,16 +260,25 @@ class Lexer:
         return token
 
     def getProcessedString(self):
-        return self.text[0:self.pos]
+        return self.text[0 : self.pos]
 
     def latestWord(self):
         processedString = self.getProcessedString()
-        latest10word = processedString[processedString.length -
-                                       20 if len(processedString) >= 20 else 0: len(processedString)]
+        latest10word = processedString[
+            processedString.length - 20
+            if len(processedString) >= 20
+            else 0 : len(processedString)
+        ]
         return latest10word
 
     def lexerError(self):
-        return LexerError(None, None, 'Lexer error on {} line : {} column : {}'.format(self.current_char, self.lineno, self.column))
+        return LexerError(
+            None,
+            None,
+            "Lexer error on {} line : {} column : {}".format(
+                self.current_char, self.lineno, self.column
+            ),
+        )
 
     def get_next_token(self):
         """
@@ -287,7 +291,7 @@ class Lexer:
                 self.skip_whitespace()
                 continue
 
-            if self.current_char == '{':
+            if self.current_char == "{":
                 self.advance()
                 self.skip_comment()
                 continue
@@ -295,13 +299,13 @@ class Lexer:
             if self.current_char.isalpha():
                 return self._id()
 
-            if self.current_char == '\'':
+            if self.current_char == "'":
                 return self.string()
 
             if self.current_char.isdigit():
                 return self.number()
 
-            if self.current_char == ':' and self.peek() == '=':
+            if self.current_char == ":" and self.peek() == "=":
                 token = Token(
                     type=TokenType.ASSIGN,
                     value=TokenType.ASSIGN.value,  # ':='
@@ -315,25 +319,47 @@ class Lexer:
             if self.current_char == ">" and self.peek() == "=":
                 self.advance()
                 self.advance()
-                return Token(TokenType.GREATER_OR_EQUALS_THAN, TokenType.GREATER_OR_EQUALS_THAN, self.lineno, self.column)
+                return Token(
+                    TokenType.GREATER_OR_EQUALS_THAN,
+                    TokenType.GREATER_OR_EQUALS_THAN,
+                    self.lineno,
+                    self.column,
+                )
 
             if self.current_char == "<" and self.peek() == "=":
                 self.advance()
                 self.advance()
-                return Token(TokenType.LESS_OR_EQUALS_THAN, TokenType.LESS_OR_EQUALS_THAN, self.lineno, self.column)
+                return Token(
+                    TokenType.LESS_OR_EQUALS_THAN,
+                    TokenType.LESS_OR_EQUALS_THAN,
+                    self.lineno,
+                    self.column,
+                )
 
             if self.current_char == "<" and self.peek() == ">":
                 self.advance()
                 self.advance()
-                return Token(TokenType.NOT_EQUALS, TokenType.NOT_EQUALS, self.lineno, self.column)
+                return Token(
+                    TokenType.NOT_EQUALS, TokenType.NOT_EQUALS, self.lineno, self.column
+                )
             if self.current_char == "<" and self.peek() == "<":
                 self.advance()
                 self.advance()
-                return Token(TokenType.BWISESHIFTLEFT, TokenType.BWISESHIFTLEFT, self.lineno, self.column)
+                return Token(
+                    TokenType.BWISESHIFTLEFT,
+                    TokenType.BWISESHIFTLEFT,
+                    self.lineno,
+                    self.column,
+                )
             if self.current_char == ">" and self.peek() == ">":
                 self.advance()
                 self.advance()
-                return Token(TokenType.BWISESHIFTRIGHT, TokenType.BWISESHIFTRIGHT, self.lineno, self.column)
+                return Token(
+                    TokenType.BWISESHIFTRIGHT,
+                    TokenType.BWISESHIFTRIGHT,
+                    self.lineno,
+                    self.column,
+                )
 
             try:
 
