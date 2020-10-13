@@ -3,21 +3,13 @@
 import argparse
 import sys
 from enum import Enum
-from base import LexerError
-from base import ParserError
-from base import SemanticError
-from base import Error
-from base import ErrorCode
-from lex import Lexer
-from parse import Parser
-from sts import SemanticAnalyzer
-from lex import TokenType
-from astvisitor import NodeVisitor
-from base import _SHOULD_LOG_STACK
-from base import _SHOULD_LOG_SCOPE
-from parse import ProcedureDecl
-from parse import FunctionDecl
 
+from astvisitor import NodeVisitor
+from base import (_SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK, Error, ErrorCode,
+                  LexerError, ParserError, SemanticError)
+from lex import Lexer, TokenType
+from parse import FunctionDecl, Parser, ProcedureDecl
+from sts import SemanticAnalyzer
 
 ###############################################################################
 #                                                                             #
@@ -27,7 +19,7 @@ from parse import FunctionDecl
 
 
 class ARType(Enum):
-    PROGRAM = 'PROGRAM'
+    PROGRAM = "PROGRAM"
 
 
 class CallStack:
@@ -38,7 +30,7 @@ class CallStack:
         arNow = self.peek()
         if arNow != None:
             ar.enclosingActivationRecord = arNow
-            ar.nestingLevel = arNow.nestingLevel+1
+            ar.nestingLevel = arNow.nestingLevel + 1
 
         self._records.append(ar)
 
@@ -53,8 +45,8 @@ class CallStack:
         # return
 
     def __str__(self):
-        s = '\n'.join(repr(ar) for ar in reversed(self._records))
-        s = f'CALL STACK\n{s}\n'
+        s = "\n".join(repr(ar) for ar in reversed(self._records))
+        s = f"CALL STACK\n{s}\n"
         return s
 
     def __repr__(self):
@@ -110,16 +102,14 @@ class ActivationRecord:
 
     def __str__(self):
         lines = [
-            '{level}: {type} {name}'.format(
-                level=self.nestingLevel,
-                type=self.type.value,
-                name=self.name,
+            "{level}: {type} {name}".format(
+                level=self.nestingLevel, type=self.type.value, name=self.name,
             )
         ]
         for name, val in self.members.items():
-            lines.append(f'   {name:<20}: {val}')
+            lines.append(f"   {name:<20}: {val}")
 
-        s = '\n'.join(lines)
+        s = "\n".join(lines)
         return s
 
     def __repr__(self):
@@ -152,20 +142,16 @@ class Interpreter(NodeVisitor):
 
     def visit_Program(self, node):
         program_name = node.name
-        self.log(f'ENTER: PROGRAM {program_name}')
+        self.log(f"ENTER: PROGRAM {program_name}")
 
-        ar = ActivationRecord(
-            name=program_name,
-            type=ARType.PROGRAM,
-            nesting_level=1,
-        )
+        ar = ActivationRecord(name=program_name, type=ARType.PROGRAM, nesting_level=1,)
         self.call_stack.push(ar)
 
         self.log(str(self.call_stack))
 
         self.visit(node.block)
 
-        self.log(f'LEAVE: PROGRAM {program_name}')
+        self.log(f"LEAVE: PROGRAM {program_name}")
         self.log(str(self.call_stack))
 
         self.call_stack.pop()
@@ -190,7 +176,7 @@ class Interpreter(NodeVisitor):
         rightVal = self.visit(node.right)
 
         if node.op.type == TokenType.PLUS:
-            return leftVal+rightVal
+            return leftVal + rightVal
         elif node.op.type == TokenType.MINUS:
             return leftVal - rightVal
         elif node.op.type == TokenType.MUL:
@@ -226,10 +212,7 @@ class Interpreter(NodeVisitor):
         elif node.op.type == TokenType.LESS_OR_EQUALS_THAN:
             return leftVal <= rightVal
         else:
-            raise self.runtimeError(
-                ErrorCode.UNEXPECTED_TOKEN,
-                node.token
-            )
+            raise self.runtimeError(ErrorCode.UNEXPECTED_TOKEN, node.token)
 
     def visit_Num(self, node):
         return node.value
@@ -243,10 +226,7 @@ class Interpreter(NodeVisitor):
     def visit_UnaryOp(self, node):
         op = node.op.type
         if self.visit(node.right) == None:
-            raise self.runtimeError(
-                ErrorCode.ID_NOT_FOUND,
-                node.token
-            )
+            raise self.runtimeError(ErrorCode.ID_NOT_FOUND, node.token)
         if op == TokenType.PLUS:
             return +self.visit(node.right)
         elif op == TokenType.MINUS:
@@ -256,10 +236,7 @@ class Interpreter(NodeVisitor):
         elif op == TokenType.BWISENOT:
             return ~self.visit(node.right)
         else:
-            raise self.runtimeError(
-                ErrorCode.UNEXPECTED_TOKEN,
-                node.token
-            )
+            raise self.runtimeError(ErrorCode.UNEXPECTED_TOKEN, node.token)
 
     def visit_Compound(self, node):
         for child in node.children:
@@ -282,15 +259,9 @@ class Interpreter(NodeVisitor):
         if ar.hasItem(varName):
             val = ar.getItem(varName)
             if val == None:
-                raise self.runtimeError(
-                    ErrorCode.VARIABLE_NOT_INITIALISER,
-                    node.token
-                )
+                raise self.runtimeError(ErrorCode.VARIABLE_NOT_INITIALISER, node.token)
             return val
-        raise self.runtimeError(
-            ErrorCode.ID_NOT_FOUND,
-            node.token
-        )
+        raise self.runtimeError(ErrorCode.ID_NOT_FOUND, node.token)
 
     def visit_NoOp(self, node):
         pass
@@ -328,7 +299,7 @@ class Interpreter(NodeVisitor):
         ar = self.call_stack.peek()
         proc = ar.getItem(name)
         if isinstance(proc, ProcedureDecl):
-            self.log('ENTER : PROCEDURE {}'.format(name))
+            self.log("ENTER : PROCEDURE {}".format(name))
             actualParamValues = []
             for actualParam in node.actualParams:
                 actualParamValues.append(self.visit(actualParam))
@@ -339,10 +310,10 @@ class Interpreter(NodeVisitor):
                 ar.declareItem(proc.params[i].var_node.value)
                 ar.setItem(proc.params[i].var_node.value, actualParamValues[i])
             self.visit(proc.blockNode)
-            self.log('{}'.format(self.call_stack))
-            self.log('LEAVE: PROCEDURE {}'.format(name))
+            self.log("{}".format(self.call_stack))
+            self.log("LEAVE: PROCEDURE {}".format(name))
         elif isinstance(proc, FunctionDecl):
-            self.log('ENTER: FUNCTION {}'.format(name))
+            self.log("ENTER: FUNCTION {}".format(name))
             actualParamValues = []
             for actualParam in node.actualParams:
                 actualParamValues.append(self.visit(actualParam))
@@ -353,14 +324,11 @@ class Interpreter(NodeVisitor):
                 ar.declareItem(proc.params[i].var_node.value)
                 ar.setItem(proc.params[i].var_node.value, actualParamValues[i])
             self.visit(proc.blockNode)
-            self.log('{}'.format(self.call_stack))
+            self.log("{}".format(self.call_stack))
             self.call_stack.pop()
-            self.log('LEAVE: FUNCTION {}'.format(name))
+            self.log("LEAVE: FUNCTION {}".format(name))
             if ar.returnValue == None:
-                raise self.runtimeError(
-                    ErrorCode.MISSING_RETURN,
-                    proc.token
-                )
+                raise self.runtimeError(ErrorCode.MISSING_RETURN, proc.token)
             return ar.returnValue
 
     def visit_Condition(self, node):
@@ -377,7 +345,7 @@ class Interpreter(NodeVisitor):
         self.visit(node.child)
 
     def visit_While(self, node):
-        while(self.visit(node.condition) == True):
+        while self.visit(node.condition) == True:
             try:
                 if self.visit(node.myDo) == True:
                     break
@@ -403,34 +371,24 @@ class Interpreter(NodeVisitor):
             return self.programActivationRecord.members
 
     def runtimeError(self, errorCode, token):
-        return RuntimeError(
-            errorCode,
-            token,
-            '{} -> {}'.format(errorCode, token)
-        )
+        return RuntimeError(errorCode, token, "{} -> {}".format(errorCode, token))
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='SPI - Simple Pascal Interpreter'
-    )
-    parser.add_argument('inputfile', help='Pascal source file')
+    parser = argparse.ArgumentParser(description="SPI - Simple Pascal Interpreter")
+    parser.add_argument("inputfile", help="Pascal source file")
     parser.add_argument(
-        '--scope',
-        help='Print scope information',
-        action='store_true',
+        "--scope", help="Print scope information", action="store_true",
     )
     parser.add_argument(
-        '--stack',
-        help='Print call stack',
-        action='store_true',
+        "--stack", help="Print call stack", action="store_true",
     )
     args = parser.parse_args()
 
     global _SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK
     _SHOULD_LOG_SCOPE, _SHOULD_LOG_STACK = args.scope, args.stack
 
-    text = open(args.inputfile, 'r').read()
+    text = open(args.inputfile, "r").read()
     # print(text)
 
     lexer = Lexer(text)
@@ -453,5 +411,5 @@ def main():
     interpreter.interpret(tree)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

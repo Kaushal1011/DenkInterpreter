@@ -1,11 +1,10 @@
-
-from base import ParserError
-from base import ErrorCode
+from base import ErrorCode, ParserError
 from lex import TokenType
 
 
 class AST:
     pass
+
 
 # Classes that extend ast
 
@@ -202,7 +201,7 @@ class MyBoolean(AST):
         self.value = bool(token.value)
 
 
-class Parser():
+class Parser:
     """Parse Class Which Generates AST"""
 
     def __init__(self, lexer):
@@ -221,7 +220,7 @@ class Parser():
         raise ParserError(
             error_code=error_code,
             token=token,
-            message=f'{error_code.value} -> {token}',
+            message=f"{error_code.value} -> {token}",
         )
 
     def eat(self, token_type):
@@ -234,8 +233,7 @@ class Parser():
             # print(self.current_token)
         else:
             self.error(
-                error_code=ErrorCode.UNEXPECTED_TOKEN,
-                token=self.current_token,
+                error_code=ErrorCode.UNEXPECTED_TOKEN, token=self.current_token,
             )
 
     # """Functions that create the tree by calling each other"""
@@ -287,7 +285,7 @@ class Parser():
             result = self.expr()
             self.eat(TokenType.RPAREN)
             return result
-        elif self.current_token.type == TokenType.ID and self.peek() == '(':
+        elif self.current_token.type == TokenType.ID and self.peek() == "(":
             return self.callStatement()
         elif self.current_token.type == TokenType.READINT:
             return self.readintStatement()
@@ -301,10 +299,12 @@ class Parser():
     def precedence2(self):
         left = self.precedence1()
         result = left
-        while self.current_token.type == TokenType.MUL \
-            or self.current_token.type == TokenType.INTEGER_DIV \
-                or self.current_token.type == TokenType.FLOAT_DIV \
-        or self.current_token.type == TokenType.AND:
+        while (
+            self.current_token.type == TokenType.MUL
+            or self.current_token.type == TokenType.INTEGER_DIV
+            or self.current_token.type == TokenType.FLOAT_DIV
+            or self.current_token.type == TokenType.AND
+        ):
             op = self.current_token
             self.eat(op.type)
             result = BinOp(result, op, self.precedence1())
@@ -313,9 +313,11 @@ class Parser():
     def precedence3(self):
         left = self.precedence2()
         result = left
-        while self.current_token.type == TokenType.PLUS \
-            or self.current_token.type == TokenType.MINUS \
-                or self.current_token.type == TokenType.OR:
+        while (
+            self.current_token.type == TokenType.PLUS
+            or self.current_token.type == TokenType.MINUS
+            or self.current_token.type == TokenType.OR
+        ):
             op = self.current_token
             self.eat(op.type)
             result = BinOp(result, op, self.precedence2())
@@ -324,8 +326,10 @@ class Parser():
     def precedence4(self):
         left = self.precedence3()
         result = left
-        while self.current_token.type == TokenType.BWISESHIFTRIGHT \
-                or self.current_token.type == TokenType.BWISESHIFTLEFT:
+        while (
+            self.current_token.type == TokenType.BWISESHIFTRIGHT
+            or self.current_token.type == TokenType.BWISESHIFTLEFT
+        ):
             op = self.current_token
             self.eat(op.type)
             result = BinOp(result, op, self.precedence3())
@@ -334,12 +338,14 @@ class Parser():
     def precedence5(self):
         left = self.precedence4()
         result = left
-        while self.current_token.type == TokenType.EQUALS \
-            or self.current_token.type == TokenType.GREATER_THAN \
-                or self.current_token.type == TokenType.GREATER_OR_EQUALS_THAN \
-        or self.current_token.type == TokenType.LESS_THAN \
-        or self.current_token.type == TokenType.LESS_OR_EQUALS_THAN \
-        or self.current_token.type == TokenType.NOT_EQUALS:
+        while (
+            self.current_token.type == TokenType.EQUALS
+            or self.current_token.type == TokenType.GREATER_THAN
+            or self.current_token.type == TokenType.GREATER_OR_EQUALS_THAN
+            or self.current_token.type == TokenType.LESS_THAN
+            or self.current_token.type == TokenType.LESS_OR_EQUALS_THAN
+            or self.current_token.type == TokenType.NOT_EQUALS
+        ):
             op = self.current_token
             self.eat(op.type)
             result = BinOp(result, op, self.precedence4())
@@ -348,9 +354,11 @@ class Parser():
     def precedence6(self):
         left = self.precedence5()
         result = left
-        while self.current_token.type == TokenType.BWISEAND or \
-            self.current_token.type == TokenType.BWISEOR or \
-                self.current_token.type == TokenType.BWISEXOR:
+        while (
+            self.current_token.type == TokenType.BWISEAND
+            or self.current_token.type == TokenType.BWISEOR
+            or self.current_token.type == TokenType.BWISEXOR
+        ):
             op = self.current_token
             self.eat(op.type)
             result = BinOp(result, op, self.precedence5())
@@ -402,10 +410,7 @@ class Parser():
         self.eat(TokenType.COLON)
 
         type_node = self.type_spec()
-        var_declarations = [
-            VarDecl(var_node, type_node)
-            for var_node in var_nodes
-        ]
+        var_declarations = [VarDecl(var_node, type_node) for var_node in var_nodes]
         return var_declarations
 
     def procedure_declaration(self):
@@ -419,8 +424,7 @@ class Parser():
 
         self.eat(TokenType.SEMI)
         block_node = self.block()
-        proc_decl = ProcedureDecl(
-            proc_name, params, block_node, self.current_token)
+        proc_decl = ProcedureDecl(proc_name, params, block_node, self.current_token)
         self.eat(TokenType.SEMI)
         return proc_decl
 
@@ -464,7 +468,7 @@ class Parser():
         declarations = []
         if self.current_token.type == TokenType.LPAREN:
             self.eat(TokenType.LPAREN)
-            while(self.current_token.type == TokenType.ID):
+            while self.current_token.type == TokenType.ID:
                 vardec = self.formal_parameters()
                 declarations.extend(vardec)
                 if self.current_token.type == TokenType.RPAREN:
@@ -526,9 +530,7 @@ class Parser():
             node = self.writelnStatement()
         elif self.current_token.type == TokenType.IF:
             node = self.conditionStatement()
-        elif (self.current_token.type == TokenType.ID and
-              self.lexer.current_char == '('
-              ):
+        elif self.current_token.type == TokenType.ID and self.lexer.current_char == "(":
             node = self.callStatement()
         elif self.current_token.type == TokenType.ID:
             node = self.assignment_statement()
@@ -555,11 +557,7 @@ class Parser():
 
         self.eat(TokenType.RPAREN)
 
-        node = Call(
-            name=proc_name,
-            actualParams=actual_params,
-            token=token,
-        )
+        node = Call(name=proc_name, actualParams=actual_params, token=token,)
         return node
 
     def assignment_statement(self):
@@ -672,11 +670,7 @@ class Parser():
 
         self.eat(TokenType.RPAREN)
 
-        node = Call(
-            name=proc_name,
-            actualParams=actual_params,
-            token=token,
-        )
+        node = Call(name=proc_name, actualParams=actual_params, token=token,)
         return node
 
     def variable(self):
@@ -701,8 +695,7 @@ class Parser():
         node = self.program()
         if self.current_token.type != TokenType.EOF:
             self.error(
-                error_code=ErrorCode.UNEXPECTED_TOKEN,
-                token=self.current_token,
+                error_code=ErrorCode.UNEXPECTED_TOKEN, token=self.current_token,
             )
 
         return node
